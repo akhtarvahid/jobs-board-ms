@@ -31,6 +31,11 @@
 $ npm install
 ```
 
+## Run postgre through docker
+```bash
+docker run --name jobs-board -p 5456:5432 -e POSTGRES_PASSWORD=jobs-board -e POSTGRES_USER=jobs-board -d postgres
+```
+
 ## Compile and run the project
 
 ```bash
