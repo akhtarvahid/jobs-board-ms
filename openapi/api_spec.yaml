@@ -18,6 +18,15 @@ paths:
           description: ''
       tags:
         - Tag
+  /user/create:
+    post:
+      operationId: UserController_createUser
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags:
+        - User
 info:
   title: TIP Medium Service
   description: A Medium Service Provider

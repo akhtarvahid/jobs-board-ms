@@ -5,6 +5,7 @@ import { TagModule } from '@app/tag/tag.module';
 import { DatabaseModule } from '@app/database/database.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserModule } from './user/user.module';
 import getTypeOrmConfig from './ormconfig';
 
 @Module({
@@ -15,6 +16,7 @@ import getTypeOrmConfig from './ormconfig';
     }),
     TypeOrmModule.forRoot(getTypeOrmConfig),
     TagModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
