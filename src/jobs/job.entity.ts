@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'ty
 import { User } from '../users/user.entity';
 // import { Application } from '../applications/application.entity';
 import { JobType } from './job-type.enum';
+import { Application } from 'src/applications/application.entity';
 
 @Entity()
 export class Job {
@@ -41,6 +42,6 @@ export class Job {
   @ManyToOne(() => User, (user) => user.jobs)
   company: User;
 
-//   @OneToMany(() => Application, (application) => application.job)
-//   applications: Application[];
+  @OneToMany(() => Application, (application) => application.job)
+  applications: Application[];
 }

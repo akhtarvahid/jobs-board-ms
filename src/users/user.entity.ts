@@ -4,6 +4,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert } from 
 import { UserRole } from './user-role.enum';
 import * as bcrypt from 'bcrypt';
 import { Job } from 'src/jobs/job.entity';
+import { Application } from 'src/applications/application.entity';
 
 @Entity()
 export class User {
@@ -35,8 +36,8 @@ export class User {
   @OneToMany(() => Job, (job) => job.company)
   jobs: Job[];
 
-//   @OneToMany(() => Application, (application) => application.user)
-//   applications: Application[];
+  @OneToMany(() => Application, (application) => application.user)
+  applications: Application[];
 
   @BeforeInsert()
   async hashPassword() {
