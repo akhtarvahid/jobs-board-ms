@@ -3,12 +3,17 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { UserEntity } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+import { BuildUserInterface } from './types/buildUserInterface.type';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
@@ -43,5 +48,27 @@ export class UserService {
       );
     }
     return userExist;
+  }
+
+  async generateToken(user: UserEntity) {
+    const payload = {
+      sub: user.id,
+      username: user.username,
+      email: user.email,
+    };
+    return {
+      access_token: await this.jwtService.signAsync(payload, {
+        secret: this.configService.get('JWT_SECRET'),
+        expiresIn: this.configService.get('JWT_EXPIRES_IN'),
+      }),
+    };
+  }
+  async buildUserResponse(userResponse: UserEntity): Promise<BuildUserInterface> {
+    return {
+      user: {
+        ...userResponse,
+        token: await this.generateToken(userResponse),
+      },
+    };
   }
 }
