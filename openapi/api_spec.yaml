@@ -9,6 +9,15 @@ paths:
           description: ''
       tags:
         - App
+  /tag:
+    get:
+      operationId: TagController_findAllTags
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Tag
 info:
   title: TIP Medium Service
   description: A Medium Service Provider
