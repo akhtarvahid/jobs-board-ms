@@ -3,6 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert } from 
 // import { Application } from '../applications/application.entity';
 import { UserRole } from './user-role.enum';
 import * as bcrypt from 'bcrypt';
+import { Job } from 'src/jobs/job.entity';
 
 @Entity()
 export class User {
@@ -31,8 +32,8 @@ export class User {
   @Column({ nullable: true })
   resumePath: string;
 
-//   @OneToMany(() => Job, (job) => job.company)
-//   jobs: Job[];
+  @OneToMany(() => Job, (job) => job.company)
+  jobs: Job[];
 
 //   @OneToMany(() => Application, (application) => application.user)
 //   applications: Application[];

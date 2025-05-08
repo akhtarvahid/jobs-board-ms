@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
+import { JobsModule } from './jobs/jobs.module';
 
 @Module({
   imports: [
@@ -13,20 +14,10 @@ import { DatabaseModule } from './database/database.module';
       isGlobal: true, // Optional: makes it available across all modules
       envFilePath: '.env',
     }),
-    // TypeOrmModule.forRoot({
-    //   type: 'postgres',
-    //   host: 'localhost',
-    //   port: 5456,
-    //   username: 'jobs-board',
-    //   password: 'jobs-board',
-    //   database: 'jobs-board',
-    //   entities: [__dirname + '/**/*.entity{.ts,.js}'],
-    //   synchronize: false,
-    //   migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
-    // }),
     DatabaseModule,
     AuthModule,
     UsersModule,
+    JobsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
