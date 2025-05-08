@@ -4,6 +4,8 @@ import { AppService } from '@app/app.service';
 import { TagModule } from '@app/tag/tag.module';
 import { DatabaseModule } from '@app/database/database.module';
 import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import getTypeOrmConfig from './ormconfig';
 
 @Module({
   imports: [
@@ -11,7 +13,7 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true, // Optional: makes it available across all modules
       envFilePath: '.env',
     }),
-    DatabaseModule,
+    TypeOrmModule.forRoot(getTypeOrmConfig),
     TagModule,
   ],
   controllers: [AppController],
