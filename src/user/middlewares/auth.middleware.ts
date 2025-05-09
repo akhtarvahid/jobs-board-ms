@@ -26,7 +26,7 @@ export class AuthMiddleware implements NestMiddleware {
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get('JWT_SECRET'),
       });
-      const currentUser = await this.userService.findByEmail(payload.email);
+      const currentUser = await this.userService.findByEmail(payload.email); // get loggedin user to attach in request
       req.user = currentUser;
       next();
     } catch (err) {
