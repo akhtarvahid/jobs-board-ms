@@ -9,6 +9,7 @@ import { UserModule } from './user/user.module';
 import getTypeOrmConfig from './ormconfig';
 import { AuthMiddleware } from './user/middlewares/auth.middleware';
 import { JwtService } from '@nestjs/jwt';
+import { StoryModule } from './story/story.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { JwtService } from '@nestjs/jwt';
     TypeOrmModule.forRoot(getTypeOrmConfig),
     TagModule,
     UserModule,
+    StoryModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtService],
@@ -30,6 +32,7 @@ export class AppModule {
       .exclude(
         { path: '/user/login', method: RequestMethod.POST },
         { path: '/user/register', method: RequestMethod.POST },
+        { path: '/story/*', method: RequestMethod.ALL },
       )
       .forRoutes({
         path: '*',

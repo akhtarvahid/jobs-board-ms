@@ -50,6 +50,15 @@ paths:
         '200':
           description: ''
       tags: *ref_0
+  /story/health:
+    get:
+      operationId: StoryController_health
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Story
 info:
   title: TIP Medium Service
   description: A Medium Service Provider
