@@ -72,14 +72,18 @@ export class UserService {
   }
 
   async updateUser(
-    user: any,
+    user: UserEntity,
     updateUserDto: UpdateUserDto,
   ): Promise<UserEntity> {
     const newUser = {
       ...user,
       ...updateUserDto,
     };
-    if (!user) return null as any;
+    if (!updateUserDto)
+      throw new HttpException(
+        'Request body is required',
+        HttpStatus.BAD_REQUEST,
+      );
     return this.userRepository.save(newUser);
   }
 
