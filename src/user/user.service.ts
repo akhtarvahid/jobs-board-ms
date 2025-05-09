@@ -35,7 +35,7 @@ export class UserService {
       where: {
         email: loginUserDto.email,
       },
-      select: ['id', 'email', 'password'], // need to pass manually because by default password({select: false}) in user.entity.ts
+      select: ['id', 'email', 'bio', 'image', 'username', 'password'], // need to pass manually because by default password({select: false}) in user.entity.ts
     });
 
     if (!user) {
@@ -56,7 +56,20 @@ export class UserService {
     return user;
   }
 
-  async findUserByEmailOrUsername(text: string, type: string) {
+  async findByEmail(email: string): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
+    }
+    return user;
+  }
+
+  async findUserByEmailOrUsername(text: string, type?: string) {
     let userExist;
     if (type === 'username') {
       userExist = await this.userRepository.findOne({

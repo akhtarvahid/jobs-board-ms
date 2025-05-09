@@ -18,7 +18,7 @@ paths:
           description: ''
       tags:
         - Tag
-  /user/create:
+  /user/register:
     post:
       operationId: UserController_createUser
       parameters: []
@@ -33,6 +33,14 @@ paths:
       parameters: []
       responses:
         '201':
+          description: ''
+      tags: *ref_0
+  /user/current-user:
+    get:
+      operationId: UserController_currentUser
+      parameters: []
+      responses:
+        '200':
           description: ''
       tags: *ref_0
 info:
