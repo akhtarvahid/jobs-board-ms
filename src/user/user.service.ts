@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { BuildUserInterface } from './types/buildUserInterface.type';
 import { LoginUserDto } from './dto/loginUser.dto';
+import { UpdateUserDto } from './dto/updateUser.dto';
 
 @Injectable()
 export class UserService {
@@ -61,12 +62,25 @@ export class UserService {
       where: {
         email,
       },
+      select: ['id', 'email', 'bio', 'image', 'username'],
     });
 
     if (!user) {
       throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
     }
     return user;
+  }
+
+  async updateUser(
+    user: any,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserEntity> {
+    const newUser = {
+      ...user,
+      ...updateUserDto,
+    };
+    if (!user) return null as any;
+    return this.userRepository.save(newUser);
   }
 
   async findUserByEmailOrUsername(text: string, type?: string) {

@@ -1,4 +1,9 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NestMiddleware,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request, Response, NextFunction } from 'express';
 import { ConfigService } from '@nestjs/config';
@@ -13,13 +18,14 @@ export class AuthMiddleware implements NestMiddleware {
     private readonly userService: UserService,
   ) {}
 
-  async use(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  async use(req: AuthenticatedRequest, _: Response, next: NextFunction) {
     const token = this.extractToken(req);
 
     if (!token) {
-      return res
-        .status(401)
-        .json({ message: 'Unauthorized: No token provided' });
+      throw new HttpException(
+        'Unauthorized: No token provided',
+        HttpStatus.UNAUTHORIZED,
+      );
     }
 
     try {
@@ -31,8 +37,7 @@ export class AuthMiddleware implements NestMiddleware {
       next();
     } catch (err) {
       console.error('Token Verification Error:', err.message);
-      // return res.status(401).json({ message: 'Invalid token' });
-      next();
+      throw new HttpException('Invalid token', HttpStatus.UNAUTHORIZED);
     }
   }
 

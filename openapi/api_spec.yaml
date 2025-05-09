@@ -43,6 +43,13 @@ paths:
         '200':
           description: ''
       tags: *ref_0
+    put:
+      operationId: UserController_updateUser
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_0
 info:
   title: TIP Medium Service
   description: A Medium Service Provider

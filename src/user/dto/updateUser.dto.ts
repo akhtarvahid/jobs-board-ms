@@ -5,4 +5,6 @@ export class UpdateUserDto {
     readonly password: string;
 
     readonly email: string;
+
+    readonly image: string;
 }
