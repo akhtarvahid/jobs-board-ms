@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { BuildUserInterface } from './types/buildUserInterface.type';
+import { LoginUserDto } from './dto/loginUser.dto';
 
 @Injectable()
 export class UserService {
@@ -23,6 +24,24 @@ export class UserService {
     const newUser = new UserEntity();
     Object.assign(newUser, createUserDto);
     return await this.userRepository.save(newUser);
+  }
+  async loginUser(loginUserDto: LoginUserDto): Promise<UserEntity> {
+    const user = await this.userRepository.findOne({
+      where: {
+        email: loginUserDto.email
+      },
+    });
+
+    if(!user) {
+      throw new HttpException(
+        'Credentials are not valid',
+        HttpStatus.UNPROCESSABLE_ENTITY
+      );
+    }
+    
+    //TODO: compare password whether matches or not
+
+    return user;
   }
 
   async findUserByEmailOrUsername(text: string, type: string) {
@@ -63,7 +82,9 @@ export class UserService {
       }),
     };
   }
-  async buildUserResponse(userResponse: UserEntity): Promise<BuildUserInterface> {
+  async buildUserResponse(
+    userResponse: UserEntity,
+  ): Promise<BuildUserInterface> {
     return {
       user: {
         ...userResponse,
