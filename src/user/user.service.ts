@@ -23,23 +23,35 @@ export class UserService {
 
     const newUser = new UserEntity();
     Object.assign(newUser, createUserDto);
-    return await this.userRepository.save(newUser);
+    const user = await this.userRepository.save(newUser);
+
+    //delete password from response for security
+    delete (user as { password?: string }).password;
+
+    return user;
   }
   async loginUser(loginUserDto: LoginUserDto): Promise<UserEntity> {
     const user = await this.userRepository.findOne({
       where: {
-        email: loginUserDto.email
+        email: loginUserDto.email,
       },
+      select: ['id', 'email', 'password'], // need to pass manually because by default password({select: false}) in user.entity.ts
     });
 
-    if(!user) {
+    if (!user) {
       throw new HttpException(
         'Credentials are not valid',
-        HttpStatus.UNPROCESSABLE_ENTITY
+        HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
-    
-    //TODO: compare password whether matches or not
+
+    //compare password whether matches or not
+    if (!user || !(await user.comparePassword(loginUserDto.password))) {
+      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    }
+
+    //delete password from response for security
+    delete (user as { password?: string }).password;
 
     return user;
   }

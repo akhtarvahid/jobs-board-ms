@@ -21,10 +21,13 @@ export class UserEntity {
     @Column({ select: false })
     password: string
 
-    // @BeforeInsert()
-    // async hashPassword() {
-    //     this.password = await bcrypt.hash(this.password, 10);
-    // }
+    @BeforeInsert()
+    async hashPassword() {
+        this.password = await bcrypt.hash(this.password, 10);
+    }
+    async comparePassword(attempt: string): Promise<boolean> {
+        return await bcrypt.compare(attempt, this.password);
+    }
 
     // @OneToMany(() => ArticleEntity, (article) => article.author)
     // articles: ArticleEntity[]
