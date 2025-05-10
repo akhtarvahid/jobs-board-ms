@@ -32,7 +32,7 @@ export class AppModule {
       .exclude(
         { path: '/user/login', method: RequestMethod.POST },
         { path: '/user/register', method: RequestMethod.POST },
-        // { path: '/story/*', method: RequestMethod.ALL },
+        // { path: '/story/*', method: RequestMethod.GET },
       )
       .forRoutes({
         path: '*',

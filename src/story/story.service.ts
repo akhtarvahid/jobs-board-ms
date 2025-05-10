@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateStoryDto } from './dto/createStory.dto';
 import { UserEntity } from '@app/user/user.entity';
 import { StoryEntity } from './story.entity';
@@ -26,6 +26,18 @@ export class StoryService {
 
     return this.storyRepository.save(story);
   }
+  async findBySlug(slug: string): Promise<StoryEntity> {
+    const story = await this.storyRepository.findOne({
+      where: {
+        slug,
+      },
+    });
+    if (!story) {
+      throw new HttpException('Story not found!', HttpStatus.NOT_FOUND);
+    }
+
+    return story;
+  }
   private getSlug(title: string): string {
     return (
       slugify(title, { lower: true }) +
@@ -33,9 +45,9 @@ export class StoryService {
       ((Math.random() * Math.pow(36, 6)) | 0).toString(36)
     );
   }
-  async buildStoryResponse(response): Promise<StoryResponseInterface> {
+  buildStoryResponse(response: StoryEntity): StoryResponseInterface {
     return {
-      story: { ...response },
+      story: response,
     };
   }
 }
