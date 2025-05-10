@@ -59,6 +59,14 @@ paths:
           description: ''
       tags: &ref_1
         - Story
+  /story/feed:
+    get:
+      operationId: StoryController_findAllStory
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
   /story/create:
     post:
       operationId: StoryController_createStory

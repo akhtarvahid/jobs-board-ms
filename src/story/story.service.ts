@@ -3,7 +3,7 @@ import { CreateStoryDto } from './dto/createStory.dto';
 import { UserEntity } from '@app/user/user.entity';
 import { StoryEntity } from './story.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { StoryResponseInterface } from './types/buildStoryResponse.type';
 import slugify from 'slugify';
 import { UpdateStoryDto } from './dto/updateStory.dto';
@@ -13,8 +13,19 @@ export class StoryService {
   constructor(
     @InjectRepository(StoryEntity)
     private readonly storyRepository: Repository<StoryEntity>,
+    private dataSource: DataSource,
   ) {}
 
+  async findAll(user: UserEntity, query: any): Promise<any> {
+    const queryBuilder = this.dataSource
+      .getRepository(StoryEntity)
+      .createQueryBuilder('stories')
+      .leftJoinAndSelect('stories.owner', 'owner');
+
+    const stories = await queryBuilder.getMany();
+
+    return stories;
+  }
   async createStory(
     createStoryDto: CreateStoryDto,
     user: UserEntity,
@@ -41,7 +52,7 @@ export class StoryService {
     }
 
     Object.assign(story, updateStoryDto);
-    
+
     return await this.storyRepository.save(story);
   }
   async findBySlug(slug: string): Promise<StoryEntity> {

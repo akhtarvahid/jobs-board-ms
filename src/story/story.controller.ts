@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -24,6 +25,12 @@ export class StoryController {
   @Get('health')
   health() {
     return 'up';
+  }
+
+  @Get('feed')
+  @UseGuards(AuthGuard)
+  async findAllStory(@User() user: UserEntity, @Query() query: any): Promise<any>{
+    return await this.storyService.findAll(user, query);
   }
 
   @Post('create')
