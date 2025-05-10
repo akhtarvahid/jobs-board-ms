@@ -7,7 +7,7 @@ import { StoryEntity } from './story.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([StoryEntity])],
-  providers: [StoryService],
+  providers: [StoryService, AuthGuard],
   controllers: [StoryController],
 })
 export class StoryModule {}

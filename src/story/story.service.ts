@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { StoryResponseInterface } from './types/buildStoryResponse.type';
 import slugify from 'slugify';
+import { UpdateStoryDto } from './dto/updateStory.dto';
 
 @Injectable()
 export class StoryService {
@@ -25,6 +26,23 @@ export class StoryService {
     story.owner = user;
 
     return this.storyRepository.save(story);
+  }
+  async updateStory(
+    updateStoryDto: UpdateStoryDto,
+    slug: string,
+    user: UserEntity,
+  ): Promise<StoryEntity> {
+    const story = await this.findBySlug(slug);
+    if (story.owner.id !== user.id) {
+      throw new HttpException(
+        'You are not authorized to perform',
+        HttpStatus.BAD_GATEWAY, // check and change
+      );
+    }
+
+    Object.assign(story, updateStoryDto);
+    
+    return await this.storyRepository.save(story);
   }
   async findBySlug(slug: string): Promise<StoryEntity> {
     const story = await this.storyRepository.findOne({

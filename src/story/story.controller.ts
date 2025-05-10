@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { StoryService } from './story.service';
@@ -13,6 +14,7 @@ import { User } from '@app/user/decorators/user.decorator';
 import { UserEntity } from '@app/user/user.entity';
 import { AuthGuard } from '@app/user/guards/auth.guard';
 import { StoryResponseInterface } from './types/buildStoryResponse.type';
+import { UpdateStoryDto } from './dto/updateStory.dto';
 
 @Controller('story')
 export class StoryController {
@@ -29,6 +31,21 @@ export class StoryController {
     @Body('story') createStoryDto: CreateStoryDto,
   ): Promise<StoryResponseInterface> {
     const story = await this.storyService.createStory(createStoryDto, user);
+    return this.storyService.buildStoryResponse(story);
+  }
+
+  @Put(':slug')
+  @UseGuards(AuthGuard)
+  async updateStory(
+    @Param('slug') slug: string,
+    @User() user: UserEntity,
+    @Body('story') updateStoryDto: UpdateStoryDto,
+  ): Promise<StoryResponseInterface> {
+    const story = await this.storyService.updateStory(
+      updateStoryDto,
+      slug,
+      user,
+    );
     return this.storyService.buildStoryResponse(story);
   }
 
