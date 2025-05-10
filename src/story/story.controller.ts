@@ -84,4 +84,14 @@ export class StoryController {
     const story = await this.storyService.likeStory(slug, user);
     return this.storyService.buildStoryResponse(story);
   }
+
+  @Delete(':slug/like')
+  @UseGuards(AuthGuard)
+  async dislikeStory(
+    @Param('slug') slug: string,
+    @User() user: UserEntity
+  ): Promise<StoryResponseInterface> {
+    const story = await this.storyService.dislikeStory(slug, user.id);
+    return this.storyService.buildStoryResponse(story);
+  }
 }

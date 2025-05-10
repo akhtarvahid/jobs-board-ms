@@ -125,6 +125,18 @@ paths:
         '201':
           description: ''
       tags: *ref_1
+    delete:
+      operationId: StoryController_dislikeStory
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
 info:
   title: TIP Medium Service
   description: A Medium Service Provider

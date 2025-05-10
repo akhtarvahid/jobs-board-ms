@@ -130,7 +130,7 @@ export class StoryService {
     });
 
     if (!currentuser) {
-      throw new HttpException('Story not found!', HttpStatus.NOT_FOUND);
+      throw new HttpException('Not a valid user!', HttpStatus.FORBIDDEN);
     }
     const isNotFavorite =
       currentuser.favorites.findIndex(
@@ -140,6 +140,27 @@ export class StoryService {
     if (isNotFavorite) {
       currentuser.favorites.push(story);
       story.favoritesCount++;
+      await this.userRepository.save(currentuser);
+      await this.storyRepository.save(story);
+    }
+
+    return story;
+  }
+  async dislikeStory(slug: string, userId: number): Promise<StoryEntity> {
+    const story = await this.findBySlug(slug);
+    const currentuser = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['favorites'],
+    });
+    if (!currentuser) {
+      throw new HttpException('Not a valid user!', HttpStatus.FORBIDDEN);
+    }
+    const storyIndex = currentuser.favorites.findIndex(
+      (storyInFavorites) => storyInFavorites.id === story.id,
+    );
+    if (storyIndex >= 0) {
+      currentuser.favorites.splice(storyIndex, 1);
+      story.favoritesCount--;
       await this.userRepository.save(currentuser);
       await this.storyRepository.save(story);
     }
