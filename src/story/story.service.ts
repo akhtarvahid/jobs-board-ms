@@ -21,7 +21,7 @@ export class StoryService {
       .getRepository(StoryEntity)
       .createQueryBuilder('stories')
       .leftJoinAndSelect('stories.owner', 'owner');
-
+    queryBuilder.orderBy('stories.createdAt', 'DESC');
     const storiesCount = await queryBuilder.getCount();
 
     if (query.limit) {
