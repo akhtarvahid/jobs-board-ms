@@ -122,6 +122,30 @@ export class StoryService {
       message: `Post with ID "${slug}" deleted successfully`,
     };
   }
+  async likeStory(slug: string, user: UserEntity): Promise<StoryEntity> {
+    const story = await this.findBySlug(slug);
+    const currentuser = await this.userRepository.findOne({
+      where: { id: user.id },
+      relations: ['favorites'],
+    });
+
+    if (!currentuser) {
+      throw new HttpException('Story not found!', HttpStatus.NOT_FOUND);
+    }
+    const isNotFavorite =
+      currentuser.favorites.findIndex(
+        (storyInFavorites) => storyInFavorites.id === story.id,
+      ) === -1;
+
+    if (isNotFavorite) {
+      currentuser.favorites.push(story);
+      story.favoritesCount++;
+      await this.userRepository.save(currentuser);
+      await this.storyRepository.save(story);
+    }
+
+    return story;
+  }
   private getSlug(title: string): string {
     return (
       slugify(title, { lower: true }) +
