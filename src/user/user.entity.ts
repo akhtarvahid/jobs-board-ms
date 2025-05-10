@@ -33,7 +33,7 @@ export class UserEntity {
     @OneToMany(() => StoryEntity, (story) => story.owner)
     stories: StoryEntity[]
 
-    // @ManyToMany(() => ArticleEntity)
-    // @JoinTable()
-    // favorites: ArticleEntity[];
+    @ManyToMany(() => StoryEntity)
+    @JoinTable()
+    favorites: StoryEntity[];
 }
