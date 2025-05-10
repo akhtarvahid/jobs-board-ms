@@ -19,9 +19,15 @@ export class StoryService {
   async findAll(user: UserEntity, query: any): Promise<any> {
     const queryBuilder = this.dataSource
       .getRepository(StoryEntity)
-      .createQueryBuilder('stories')
-      .leftJoinAndSelect('stories.owner', 'owner');
-    queryBuilder.orderBy('stories.createdAt', 'DESC');
+      .createQueryBuilder('storyQuery')
+      .leftJoinAndSelect('storyQuery.owner', 'owner');
+
+    if (query.tag) {
+      queryBuilder.andWhere('storyQuery.tagList ILIKE :tag', {
+        tag: `%${query.tag}%`,
+      });
+    }
+    queryBuilder.orderBy('storyQuery.createdAt', 'DESC');
     const storiesCount = await queryBuilder.getCount();
 
     if (query.limit) {
