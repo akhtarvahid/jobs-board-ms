@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert, OneToMany, JoinTable, ManyToMany } from "typeorm"
 import * as bcrypt from 'bcrypt';
+import { StoryEntity } from "@app/story/story.entity";
 
 @Entity({ name: 'user' })
 export class UserEntity {
@@ -29,8 +30,8 @@ export class UserEntity {
         return await bcrypt.compare(attempt, this.password);
     }
 
-    // @OneToMany(() => ArticleEntity, (article) => article.author)
-    // articles: ArticleEntity[]
+    @OneToMany(() => StoryEntity, (story) => story.owner)
+    stories: StoryEntity[]
 
     // @ManyToMany(() => ArticleEntity)
     // @JoinTable()
