@@ -18,7 +18,7 @@ export class StoryService {
     private dataSource: DataSource,
   ) {}
 
-  async findAll(user: UserEntity, query: any): Promise<any> {
+  async findAll(userId: number, query: any): Promise<any> {
     const queryBuilder = this.dataSource
       .getRepository(StoryEntity)
       .createQueryBuilder('storyQuery')
@@ -50,6 +50,21 @@ export class StoryService {
         id: owner.id,
       });
     }
+
+    if (query.favorited) {
+      const owner = await this.userRepository.findOne({
+        where: { username: query.favorited },
+        relations: ['favorites'],
+      });
+
+      const ids = owner?.favorites.map((fav) => fav.id);
+      if (ids && ids?.length > 0) {
+        queryBuilder.andWhere('storyQuery.id IN (:...ids)', { ids });
+      } else {
+        queryBuilder.andWhere('1=0');
+      }
+    }
+
     queryBuilder.orderBy('storyQuery.createdAt', 'DESC');
     const storiesCount = await queryBuilder.getCount();
 
@@ -60,9 +75,28 @@ export class StoryService {
     if (query.offset) {
       queryBuilder.offset(query.offset);
     }
-    const stories = await queryBuilder.getMany();
 
-    return { stories, storiesCount };
+    // Favorited:true/false logic
+    let favoriteIds: number[] = [];
+    if (userId) {
+      const currentUser = await this.userRepository.findOne({
+        where: { id: userId },
+        relations: ['favorites'],
+      });
+      console.log(currentUser);
+
+      if (!currentUser) {
+        throw new HttpException('User not found!', HttpStatus.FORBIDDEN);
+      }
+      favoriteIds = currentUser.favorites.map((fav) => parseInt(fav.id));
+    }
+    const stories = await queryBuilder.getMany();
+    const storyWithFavorited = stories.map((story) => {
+      const favorited = favoriteIds.includes(parseInt(story.id));
+      return { ...story, favorited };
+    });
+
+    return { stories: storyWithFavorited, storiesCount };
   }
   async createStory(
     createStoryDto: CreateStoryDto,

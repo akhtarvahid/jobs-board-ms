@@ -29,8 +29,8 @@ export class StoryController {
 
   @Get('feed')
   @UseGuards(AuthGuard)
-  async findAllStory(@User() user: UserEntity, @Query() query: any): Promise<any>{
-    return await this.storyService.findAll(user, query);
+  async findAllStory(@User('id') userId: number, @Query() query: any): Promise<any>{
+    return await this.storyService.findAll(userId, query);
   }
 
   @Post('create')
