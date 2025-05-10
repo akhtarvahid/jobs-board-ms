@@ -4,9 +4,10 @@ import { StoryController } from './story.controller';
 import { AuthGuard } from '@app/user/guards/auth.guard';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StoryEntity } from './story.entity';
+import { UserEntity } from '@app/user/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([StoryEntity])],
+  imports: [TypeOrmModule.forFeature([StoryEntity, UserEntity])],
   providers: [StoryService, AuthGuard],
   controllers: [StoryController],
 })

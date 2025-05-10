@@ -13,6 +13,8 @@ export class StoryService {
   constructor(
     @InjectRepository(StoryEntity)
     private readonly storyRepository: Repository<StoryEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     private dataSource: DataSource,
   ) {}
 
@@ -22,9 +24,30 @@ export class StoryService {
       .createQueryBuilder('storyQuery')
       .leftJoinAndSelect('storyQuery.owner', 'owner');
 
+    // filter by tag
     if (query.tag) {
       queryBuilder.andWhere('storyQuery.tagList ILIKE :tag', {
         tag: `%${query.tag}%`,
+      });
+    }
+
+    // filter by owner
+    if (query.owner) {
+      const owner = await this.userRepository.findOne({
+        where: {
+          username: query.owner,
+        },
+      });
+
+      if (!owner) {
+        throw new HttpException(
+          'Username does not exist',
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      queryBuilder.andWhere('storyQuery.ownerId = :id', {
+        id: owner.id,
       });
     }
     queryBuilder.orderBy('storyQuery.createdAt', 'DESC');
