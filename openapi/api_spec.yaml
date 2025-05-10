@@ -57,8 +57,16 @@ paths:
       responses:
         '200':
           description: ''
-      tags:
+      tags: &ref_1
         - Story
+  /story/create:
+    post:
+      operationId: StoryController_createStory
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags: *ref_1
 info:
   title: TIP Medium Service
   description: A Medium Service Provider
