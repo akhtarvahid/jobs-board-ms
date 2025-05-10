@@ -22,9 +22,18 @@ export class StoryService {
       .createQueryBuilder('stories')
       .leftJoinAndSelect('stories.owner', 'owner');
 
+    const storiesCount = await queryBuilder.getCount();
+
+    if (query.limit) {
+      queryBuilder.limit(query.limit);
+    }
+
+    if (query.offset) {
+      queryBuilder.offset(query.offset);
+    }
     const stories = await queryBuilder.getMany();
 
-    return stories;
+    return { stories, storiesCount };
   }
   async createStory(
     createStoryDto: CreateStoryDto,
