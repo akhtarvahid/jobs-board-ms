@@ -38,6 +38,23 @@ export class StoryService {
 
     return story;
   }
+  async deleteBySlug(
+    userId: number,
+    slug: string,
+  ): Promise<{ message: string }> {
+    const story = await this.findBySlug(slug);
+
+    if (userId !== story.owner.id) {
+      throw new HttpException(
+        'You do not have permission to modify this story',
+        HttpStatus.FORBIDDEN,
+      );
+    }
+    await this.storyRepository.delete(story.id);
+    return {
+      message: `Post with ID "${slug}" deleted successfully`,
+    };
+  }
   private getSlug(title: string): string {
     return (
       slugify(title, { lower: true }) +
@@ -45,6 +62,7 @@ export class StoryService {
       ((Math.random() * Math.pow(36, 6)) | 0).toString(36)
     );
   }
+
   buildStoryResponse(response: StoryEntity): StoryResponseInterface {
     return {
       story: response,

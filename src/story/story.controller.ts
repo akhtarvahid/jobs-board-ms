@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { StoryService } from './story.service';
 import { CreateStoryDto } from './dto/createStory.dto';
 import { User } from '@app/user/decorators/user.decorator';
@@ -30,5 +38,13 @@ export class StoryController {
   ): Promise<StoryResponseInterface> {
     const story = await this.storyService.findBySlug(slug);
     return this.storyService.buildStoryResponse(story);
+  }
+
+  @Delete(':slug')
+  async deleteAStory(
+    @User('id') userId: number,
+    @Param('slug') slug: string,
+  ): Promise<{ message: string }> {
+    return await this.storyService.deleteBySlug(userId, slug);
   }
 }
