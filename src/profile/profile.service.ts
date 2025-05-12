@@ -52,6 +52,27 @@ export class ProfileService {
     };
   }
 
+  async unfollow(username: string, userId: number): Promise<ProfileType> {
+    const followingUser = await this.findByUsername(username);
+
+    if (followingUser.id === userId) {
+      throw new HttpException(
+        "Follower and following can't be equal",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    await this.profileRepository.delete({
+      followerId: userId.toString(),
+      followingId: followingUser.id.toString(),
+    });
+
+    return {
+      ...followingUser,
+      following: false,
+    };
+  }
+
   buildResponseType(response: ProfileType): ProfileResponseInterface {
     delete (response as { email?: string }).email;
     return {

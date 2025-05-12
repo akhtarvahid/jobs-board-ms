@@ -172,6 +172,19 @@ paths:
         '201':
           description: ''
       tags: *ref_2
+  /profile/{username}/unfollow:
+    delete:
+      operationId: ProfileController_unfollowProfile
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_2
 info:
   title: TIP Medium Service
   description: A Medium Service Provider
