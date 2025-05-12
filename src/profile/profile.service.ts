@@ -18,10 +18,21 @@ export class ProfileService {
   ) {}
 
   async getProfile(username: string, userId: number): Promise<ProfileType> {
-    const user = await this.findByUsername(username);
+    const profile = await this.findByUsername(username);
+
+    const isFollowing = await this.profileRepository
+      .createQueryBuilder('follows')
+      .where('follows.followerId = :followerId', {
+        followerId: userId.toString(),
+      })
+      .andWhere('follows.followingId = :followingId', {
+        followingId: profile.id.toString(),
+      })
+      .getExists();
+
     return {
-      ...user,
-      following: false,
+      ...profile,
+      following: isFollowing,
     };
   }
   async follow(username: string, userId: number): Promise<ProfileType> {
