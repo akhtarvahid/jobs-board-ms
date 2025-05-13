@@ -27,10 +27,22 @@ export class StoryController {
     return 'up';
   }
 
+  @Get('all')
+  @UseGuards(AuthGuard)
+  async findAllStory(
+    @User('id') userId: number,
+    @Query() query: any,
+  ): Promise<any> {
+    return await this.storyService.findAll(userId, query);
+  }
+
   @Get('feed')
   @UseGuards(AuthGuard)
-  async findAllStory(@User('id') userId: number, @Query() query: any): Promise<any>{
-    return await this.storyService.findAll(userId, query);
+  async userStories(
+    @User('id') userId: number,
+    @Query() query: any,
+  ): Promise<any> {
+    return await this.storyService.findUserStories(userId, query);
   }
 
   @Post('create')
@@ -79,7 +91,7 @@ export class StoryController {
   @UseGuards(AuthGuard)
   async likeStory(
     @Param('slug') slug: string,
-    @User() user: UserEntity
+    @User() user: UserEntity,
   ): Promise<StoryResponseInterface> {
     const story = await this.storyService.likeStory(slug, user);
     return this.storyService.buildStoryResponse(story);
@@ -89,7 +101,7 @@ export class StoryController {
   @UseGuards(AuthGuard)
   async dislikeStory(
     @Param('slug') slug: string,
-    @User() user: UserEntity
+    @User() user: UserEntity,
   ): Promise<StoryResponseInterface> {
     const story = await this.storyService.dislikeStory(slug, user.id);
     return this.storyService.buildStoryResponse(story);
