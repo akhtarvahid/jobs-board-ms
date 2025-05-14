@@ -34,6 +34,7 @@ export class AppModule {
       .exclude(
         { path: '/user/login', method: RequestMethod.POST },
         { path: '/user/register', method: RequestMethod.POST },
+         { path: '/tag', method: RequestMethod.ALL },
         // { path: '/story/:slug', method: RequestMethod.GET },
       )
       .forRoutes({
