@@ -4,9 +4,12 @@ if (!process.env.IS_TS_NODE) {
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { swaggerConfig } from './config/swagger.config';
+import { GlobalValidationPipe } from './shared/pipes/global-validation.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new GlobalValidationPipe());
+
   swaggerConfig(app);
   console.log(`App running on port: 3000`);
   console.log(`Swagger is live - http://localhost:3000/api#/`);
