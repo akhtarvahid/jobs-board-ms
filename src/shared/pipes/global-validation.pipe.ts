@@ -17,6 +17,10 @@ export class GlobalValidationPipe implements PipeTransform {
     const object = plainToInstance(metatype, value);
     const errors = await validate(object);
 
+    if (typeof object !== 'object') {
+      return value;
+    }
+
     if (errors.length > 0) {
       throw new BadRequestException({
         statusCode: 400,
@@ -34,11 +38,14 @@ export class GlobalValidationPipe implements PipeTransform {
   }
 
   private formatErrors(errors: ValidationError[]) {
-    return errors.reduce((acc, error) => {
-      acc[error.property] = error.constraints
-        ? Object.values(error.constraints)
-        : ['Validation error'];
-      return acc;
-    }, {} as Record<string, string[]>);
+    return errors.reduce(
+      (acc, error) => {
+        acc[error.property] = error.constraints
+          ? Object.values(error.constraints)
+          : ['Validation error'];
+        return acc;
+      },
+      {} as Record<string, string[]>,
+    );
   }
 }
