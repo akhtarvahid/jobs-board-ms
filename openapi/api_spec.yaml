@@ -193,6 +193,15 @@ paths:
         '200':
           description: ''
       tags: *ref_2
+  /story:
+    get:
+      operationId: CommentController_health
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Comment
 info:
   title: TIP Medium Service
   description: A Medium Service Provider

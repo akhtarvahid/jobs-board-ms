@@ -11,6 +11,7 @@ import { AuthMiddleware } from './user/middlewares/auth.middleware';
 import { JwtService } from '@nestjs/jwt';
 import { StoryModule } from './story/story.module';
 import { ProfileModule } from './profile/profile.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ProfileModule } from './profile/profile.module';
     UserModule,
     StoryModule,
     ProfileModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtService],
