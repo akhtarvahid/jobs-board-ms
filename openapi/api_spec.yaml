@@ -97,17 +97,13 @@ paths:
           description: ''
       tags: *ref_1
     get:
-      operationId: StoryController_findAStory
-      parameters:
-        - name: slug
-          required: true
-          in: path
-          schema:
-            type: string
+      operationId: CommentController_health
+      parameters: []
       responses:
         '200':
           description: ''
-      tags: *ref_1
+      tags: &ref_3
+        - Comment
     delete:
       operationId: StoryController_deleteAStory
       parameters:
@@ -193,15 +189,19 @@ paths:
         '200':
           description: ''
       tags: *ref_2
-  /story:
-    get:
-      operationId: CommentController_health
-      parameters: []
+  /story/{slug}/comment:
+    post:
+      operationId: CommentController_createComment
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
       responses:
-        '200':
+        '201':
           description: ''
-      tags:
-        - Comment
+      tags: *ref_3
 info:
   title: TIP Medium Service
   description: A Medium Service Provider
