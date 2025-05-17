@@ -202,6 +202,19 @@ paths:
         '201':
           description: ''
       tags: *ref_3
+  /story/{slug}/comment/{id}:
+    delete:
+      operationId: CommentController_deleteComment
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags: *ref_3
 info:
   title: TIP Medium Service
   description: A Medium Service Provider
