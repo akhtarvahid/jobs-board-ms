@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import { CommentService } from './comment.service';
@@ -16,6 +17,7 @@ import {
   BuildResponse,
   DeleteResponseType,
 } from './types/buildResponse.interface';
+import { UpdateCommentDto } from './dto/updateComment.dto';
 
 @Controller('story/:slug')
 export class CommentController {
@@ -39,6 +41,21 @@ export class CommentController {
     );
     return this.commentService.buildResponse(comment);
   }
+  @Put('/comment/:id')
+  @UseGuards(AuthGuard)
+  async updateComment(
+    @User() user: UserEntity,
+    @Param('id') commentId: number,
+    @Body('comment') updateCommentDto: UpdateCommentDto,
+  ): Promise<BuildResponse> {
+    const updatedComment = await this.commentService.update(
+      user,
+      commentId,
+      updateCommentDto,
+    );
+
+    return this.commentService.buildResponse(updatedComment);
+  }
 
   @Delete('/comment/:id')
   @UseGuards(AuthGuard)
@@ -46,6 +63,6 @@ export class CommentController {
     @User() user: UserEntity,
     @Param('id') commentId: number,
   ): Promise<DeleteResponseType> {
-    return  await this.commentService.delete(user, commentId);
+    return await this.commentService.delete(user, commentId);
   }
 }

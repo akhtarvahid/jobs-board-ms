@@ -203,6 +203,18 @@ paths:
           description: ''
       tags: *ref_3
   /story/{slug}/comment/{id}:
+    put:
+      operationId: CommentController_updateComment
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags: *ref_3
     delete:
       operationId: CommentController_deleteComment
       parameters:

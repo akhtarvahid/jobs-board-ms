@@ -13,6 +13,7 @@ import {
   DeleteResponseType,
 } from './types/buildResponse.interface';
 import { UserEntity } from '@app/user/user.entity';
+import { UpdateCommentDto } from './dto/updateComment.dto';
 
 @Injectable()
 export class CommentService {
@@ -36,10 +37,33 @@ export class CommentService {
     const comment = await this.commentRepository.save({
       ...createCommentDto,
       story,
-      owner: user,
     });
     return comment;
   }
+  async update(
+    user: UserEntity,
+    commentId: number,
+    updateCommentDto: UpdateCommentDto,
+  ): Promise<CommentEntity> {
+    const comment = await this.commentRepository.findOne({
+      where: { id: commentId },
+      relations: ['story', 'owner'],
+    });
+
+    if (!comment) {
+      throw new HttpException(
+        'comment does not exist!',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+    if (comment.story.owner?.id !== user.id) {
+      throw new ForbiddenException('You can only update your own comments');
+    }
+    Object.assign(comment, updateCommentDto);
+
+    return await this.commentRepository.save(comment);
+  }
+
   async delete(
     user: UserEntity,
     commentId: number,
