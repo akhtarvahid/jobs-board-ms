@@ -64,23 +64,37 @@ export class CommentService {
   ): Promise<CommentEntity> {
     const comment = await this.commentRepository.findOne({
       where: { id: commentId },
-      relations: ['story', 'owner'],
+      relations: {
+        owner: true,
+        story: true,
+      },
+      select: {
+        story: { id: true, title: true },
+        owner: { id: true, username: true, email: true },
+      },
     });
 
     if (!comment) {
       throw new HttpException(
-        'comment does not exist!',
+        'Comment does not exist!',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
-    if (comment.story.owner?.id !== user.id) {
+    if (comment.owner?.id !== user.id) {
       throw new ForbiddenException('You can only update your own comments');
     }
     Object.assign(comment, updateCommentDto);
 
     return await this.commentRepository.save({
-      ...comment,
-      owner: user,
+      ...{
+        ...comment,
+        story: { id: comment.story.id, title: comment.story.title },
+      },
+      owner: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+      },
     });
   }
 
@@ -88,21 +102,25 @@ export class CommentService {
     user: UserEntity,
     commentId: number,
   ): Promise<DeleteResponseType> {
-    let comment;
-
-    comment = await this.commentRepository.findOne({
+    const comment = await this.commentRepository.findOne({
       where: {
         id: commentId,
       },
       relations: ['owner'],
+      select: ['owner'],
     });
+    if (!comment) {
+      throw new HttpException(
+        'Comment not found!',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
     // Check if current user is the owner
-    if (comment.owner.id !== user.id) {
+    if (comment?.owner.id !== user.id) {
       throw new ForbiddenException('You can only delete your own comments');
     }
-    if (comment) {
-      await this.commentRepository.delete(comment.id);
-    }
+
+    await this.commentRepository.delete(comment.id);
 
     return { message: `Comment ${comment?.id} is deleted successfully!` };
   }
