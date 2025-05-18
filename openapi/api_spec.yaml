@@ -190,6 +190,18 @@ paths:
           description: ''
       tags: *ref_2
   /story/{slug}/comment:
+    get:
+      operationId: CommentController_getAllComments
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_3
     post:
       operationId: CommentController_createComment
       parameters:

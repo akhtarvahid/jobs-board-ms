@@ -15,8 +15,9 @@ import { CreateCommentDto } from './dto/createComment.dto';
 import { AuthGuard } from '@app/user/guards/auth.guard';
 import {
   BuildResponse,
+  CommentsResponseType,
   DeleteResponseType,
-} from './types/buildResponse.interface';
+} from './types/response.interface';
 import { UpdateCommentDto } from './dto/updateComment.dto';
 
 @Controller('story/:slug')
@@ -25,6 +26,14 @@ export class CommentController {
   @Get()
   health() {
     return 'up';
+  }
+
+  @Get('comment')
+  @UseGuards(AuthGuard)
+  async getAllComments(
+    @Param('slug') slug: string,
+  ): Promise<CommentsResponseType> {
+    return await this.commentService.findAll(slug);
   }
 
   @Post('/comment')

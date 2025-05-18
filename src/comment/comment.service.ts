@@ -6,12 +6,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommentEntity } from './comment.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { StoryEntity } from '@app/story/story.entity';
 import {
   BuildResponse,
+  CommentsResponseType,
   DeleteResponseType,
-} from './types/buildResponse.interface';
+} from './types/response.interface';
 import { UserEntity } from '@app/user/user.entity';
 import { UpdateCommentDto } from './dto/updateComment.dto';
 
@@ -22,7 +23,22 @@ export class CommentService {
     private readonly commentRepository: Repository<CommentEntity>,
     @InjectRepository(StoryEntity)
     private readonly storyRepository: Repository<StoryEntity>,
+    private dataSource: DataSource,
   ) {}
+
+  async findAll(slug: string): Promise<CommentsResponseType> {
+    const queryBuilder = this.dataSource
+      .getRepository(CommentEntity)
+      .createQueryBuilder('comment')
+      .leftJoinAndSelect('comment.owner', 'owner')
+      .leftJoin('comment.story', 'story')
+      .where('story.slug = :slug', { slug });
+
+    queryBuilder.orderBy('comment.createdAt', 'DESC');
+    const storyCommentsCount = await queryBuilder.getMany();
+
+    return { comments: storyCommentsCount };
+  }
 
   async create(user, slug, createCommentDto): Promise<CommentEntity> {
     const story = await this.storyRepository.findOne({
@@ -37,6 +53,7 @@ export class CommentService {
     const comment = await this.commentRepository.save({
       ...createCommentDto,
       story,
+      owner: user,
     });
     return comment;
   }
@@ -61,7 +78,10 @@ export class CommentService {
     }
     Object.assign(comment, updateCommentDto);
 
-    return await this.commentRepository.save(comment);
+    return await this.commentRepository.save({
+      ...comment,
+      owner: user,
+    });
   }
 
   async delete(
