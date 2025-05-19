@@ -127,11 +127,58 @@ paths:
       summary: Get current user profile
       tags: *ref_0
     put:
+      description: Updates and returns the modified user profile
       operationId: UserController_updateUser
       parameters: []
+      requestBody:
+        required: true
+        description: User data to update
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  $ref: '#/components/schemas/UpdateUserDto'
+              example:
+                user:
+                  username: john_doe
+                  bio: It's beginning to build the world!
+                  image: http://unsplash.com/hair-color.png
       responses:
         '200':
-          description: ''
+          description: Successfully updated user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: number
+                        example: 8
+                      email:
+                        type: string
+                        example: vahid@gmail.com
+                      username:
+                        type: string
+                        example: vahid-ak
+                      bio:
+                        type: string
+                        example: It's beginning to build the world!
+                      image:
+                        type: string
+                        example: http://unsplash.com/hair-color.png
+                      token:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Unauthorized - Invalid or missing token
+      security:
+        - JWT-auth: []
+      summary: Update current user profile
       tags: *ref_0
   /story/health:
     get:

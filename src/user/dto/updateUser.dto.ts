@@ -1,10 +1,24 @@
+import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdateUserDto {
-    readonly username: string;
+  @ApiProperty({
+    example: 'john_doe',
+    description: 'New username',
+    required: false
+  })
+  readonly username: string;
 
-    readonly password: string;
+  @ApiProperty({
+    example: 'It\'s beginning to build the world!',
+    description: 'User biography',
+    required: false
+  })
+  readonly bio: string;
 
-    readonly email: string;
-
-    readonly image: string;
+  @ApiProperty({
+    example: 'http://unsplash.com/hair-color.png',
+    description: 'Profile image URL',
+    required: false
+  })
+  readonly image: string;
 }

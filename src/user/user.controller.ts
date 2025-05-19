@@ -164,6 +164,62 @@ export class UserController {
   }
 
   @Put('current-user')
+  @ApiBearerAuth('JWT-auth') // Requires valid JWT token
+  @ApiOperation({
+    summary: 'Update current user profile',
+    description: 'Updates and returns the modified user profile',
+  })
+  @ApiBody({
+    description: 'User data to update',
+    schema: {
+      type: 'object',
+      properties: {
+        user: {
+          $ref: '#/components/schemas/UpdateUserDto',
+        },
+      },
+      example: {
+        user: {
+          username: 'john_doe',
+          bio: "It's beginning to build the world!",
+          image: 'http://unsplash.com/hair-color.png',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully updated user',
+    schema: {
+      type: 'object',
+      properties: {
+        user: {
+          type: 'object',
+          properties: {
+            id: { type: 'number', example: 8 },
+            email: { type: 'string', example: 'vahid@gmail.com' },
+            username: { type: 'string', example: 'vahid-ak' },
+            bio: {
+              type: 'string',
+              example: "It's beginning to build the world!",
+            },
+            image: {
+              type: 'string',
+              example: 'http://unsplash.com/hair-color.png',
+            },
+            token: {
+              type: 'string',
+              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing token',
+  })
   @UseGuards(AuthGuard)
   async updateUser(
     @User() user: UserEntity,
