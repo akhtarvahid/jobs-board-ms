@@ -8,6 +8,7 @@ export const swaggerConfig = (app: INestApplication): void => {
         .setTitle('TIP Medium Service')
         .setDescription('A Medium Service Provider')
         .setVersion('1.0')
+        .addBearerAuth()
         .build();
     const document = SwaggerModule.createDocument(app, config);
 
@@ -15,7 +16,7 @@ export const swaggerConfig = (app: INestApplication): void => {
     if (!fs.existsSync(openapiDir)) {
         fs.mkdirSync(openapiDir);
     }
-    fs.writeFileSync(`${openapiDir}/api_spec.yaml`, yaml.dump(document));
+    fs.writeFileSync(`${openapiDir}/swagger.yaml`, yaml.dump(document));
 
     SwaggerModule.setup('api', app, document);
 };

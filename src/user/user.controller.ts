@@ -17,11 +17,49 @@ import { UserEntity } from './user.entity';
 import { AuthGuard } from './guards/auth.guard';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { GlobalValidationPipe } from '@app/shared/pipes/global-validation.pipe';
+import { ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
   @Post('register')
+  @ApiOperation({ summary: 'Register a new user' })
+  @ApiBody({
+    description: 'User registration data',
+    schema: {
+      type: 'object',
+      properties: {
+        user: {
+          $ref: '#/components/schemas/CreateUserDto',
+        },
+      },
+      required: ['user'],
+      example: {
+        user: {
+          username: 'john_doe',
+          password: 'securePassword123!',
+          email: 'john@example.com',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'User successfully registered',
+    schema: {
+      type: 'object',
+      properties: {
+        user: {
+          $ref: '#/components/schemas/BuildUserInterface', // Define this if you want response documentation
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Validation error (e.g., invalid email)',
+  })
   @UsePipes(new ValidationPipe())
   async createUser(
     @Body('user') createUserDto: CreateUserDto,
