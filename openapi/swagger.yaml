@@ -105,11 +105,26 @@ paths:
       tags: *ref_0
   /user/current-user:
     get:
+      description: Returns the profile of the authenticated user
       operationId: UserController_currentUser
       parameters: []
       responses:
         '200':
-          description: ''
+          description: Successfully returned user profile
+          content:
+            application/json:
+              schema:
+                example:
+                  user:
+                    id: 1
+                    username: john_doe
+                    email: john@example.com
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Unauthorized - Invalid or missing token
+      security:
+        - JWT-auth: []
+      summary: Get current user profile
       tags: *ref_0
     put:
       operationId: UserController_updateUser
@@ -316,8 +331,11 @@ tags: []
 servers: []
 components:
   securitySchemes:
-    bearer:
+    JWT-auth:
       scheme: bearer
       bearerFormat: JWT
       type: http
+      name: Authorization
+      description: Enter JWT token
+      in: header
   schemas: {}

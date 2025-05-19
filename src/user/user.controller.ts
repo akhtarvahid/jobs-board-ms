@@ -17,7 +17,13 @@ import { UserEntity } from './user.entity';
 import { AuthGuard } from './guards/auth.guard';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { GlobalValidationPipe } from '@app/shared/pipes/global-validation.pipe';
-import { ApiOperation, ApiBody, ApiResponse, ApiSecurity } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiBody,
+  ApiResponse,
+  ApiSecurity,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 
 @Controller('user')
 export class UserController {
@@ -68,67 +74,90 @@ export class UserController {
     return this.userService.buildUserResponse(user);
   }
 
-@Post('login')
-@ApiOperation({ summary: 'Login existing user' })
-@ApiBody({
-  description: 'User login credentials',
-  schema: {
-    type: 'object',
-    properties: {
-      user: {
-        type: 'object',
-        properties: {
-          email: { 
-            type: 'string',
-            example: 'john@example.com'
+  @Post('login')
+  @ApiOperation({ summary: 'Login existing user' })
+  @ApiBody({
+    description: 'User login credentials',
+    schema: {
+      type: 'object',
+      properties: {
+        user: {
+          type: 'object',
+          properties: {
+            email: {
+              type: 'string',
+              example: 'john@example.com',
+            },
+            password: {
+              type: 'string',
+              example: 'securePassword123!',
+            },
           },
-          password: {
-            type: 'string',
-            example: 'securePassword123!'
-          }
+          required: ['email', 'password'],
         },
-        required: ['email', 'password']
-      }
+      },
+      example: {
+        user: {
+          email: 'john@example.com',
+          password: 'securePassword123!',
+        },
+      },
     },
-    example: {
-      user: {
-        email: 'john@example.com',
-        password: 'securePassword123!'
-      }
-    }
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully logged in',
+    schema: {
+      type: 'object',
+      properties: {
+        user: {
+          type: 'object',
+          properties: {
+            email: { type: 'string' },
+            token: { type: 'string' },
+            // Add other user fields you return
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Invalid credentials',
+  })
+  @ApiSecurity('public') // Disables auth requirement in Swagger UI
+  @UsePipes(new ValidationPipe())
+  async loginUser(
+    @Body('user') loginUserDto: LoginUserDto,
+  ): Promise<BuildUserInterface> {
+    const user = await this.userService.loginUser(loginUserDto);
+    return this.userService.buildUserResponse(user);
   }
-})
-@ApiResponse({
-  status: 200,
-  description: 'Successfully logged in',
-  schema: {
-    type: 'object',
-    properties: {
-      user: {
-        type: 'object',
-        properties: {
-          email: { type: 'string' },
-          token: { type: 'string' }
-          // Add other user fields you return
-        }
-      }
-    }
-  }
-})
-@ApiResponse({
-  status: 401,
-  description: 'Invalid credentials'
-})
-@ApiSecurity('public') // Disables auth requirement in Swagger UI
-@UsePipes(new ValidationPipe())
-async loginUser(
-  @Body('user') loginUserDto: LoginUserDto,
-): Promise<BuildUserInterface> {
-  const user = await this.userService.loginUser(loginUserDto);
-  return this.userService.buildUserResponse(user);
-}
 
   @Get('current-user')
+  @ApiBearerAuth('JWT-auth') // Must match the security name in main.ts
+  @ApiOperation({
+    summary: 'Get current user profile',
+    description: 'Returns the profile of the authenticated user',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successfully returned user profile',
+    schema: {
+      example: {
+        user: {
+          id: 1,
+          username: 'john_doe',
+          email: 'john@example.com',
+          token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing token',
+  })
   @UseGuards(AuthGuard)
   async currentUser(@User() user: UserEntity): Promise<BuildUserInterface> {
     return this.userService.buildUserResponse(user);
