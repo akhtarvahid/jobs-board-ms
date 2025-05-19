@@ -58,9 +58,50 @@ paths:
     post:
       operationId: UserController_loginUser
       parameters: []
+      requestBody:
+        required: true
+        description: User login credentials
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      example: john@example.com
+                    password:
+                      type: string
+                      example: securePassword123!
+                  required:
+                    - email
+                    - password
+              example:
+                user:
+                  email: john@example.com
+                  password: securePassword123!
       responses:
-        '201':
-          description: ''
+        '200':
+          description: Successfully logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                      token:
+                        type: string
+        '401':
+          description: Invalid credentials
+      security:
+        - public: []
+      summary: Login existing user
       tags: *ref_0
   /user/current-user:
     get:
