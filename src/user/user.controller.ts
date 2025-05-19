@@ -15,7 +15,7 @@ import { BuildUserInterface } from './types/buildUserInterface.type';
 import { User } from './decorators/user.decorator';
 import { UserEntity } from './user.entity';
 import { AuthGuard } from './guards/auth.guard';
-import { UpdateUserDto } from './dto/updateUser.dto';
+import { UpdateUserDto, UpdateUserDtoWrapper } from './dto/updateUser.dto';
 import { GlobalValidationPipe } from '@app/shared/pipes/global-validation.pipe';
 import {
   ApiOperation,
@@ -171,15 +171,10 @@ export class UserController {
   })
   @ApiBody({
     description: 'User data to update',
-    schema: {
-      type: 'object',
-      properties: {
-        user: {
-          $ref: '#/components/schemas/UpdateUserDto',
-        },
-      },
-      example: {
-        user: {
+    type: UpdateUserDto,
+    examples: {
+      example1: {
+        value: {
           username: 'john_doe',
           bio: "It's beginning to build the world!",
           image: 'http://unsplash.com/hair-color.png',
@@ -194,24 +189,7 @@ export class UserController {
       type: 'object',
       properties: {
         user: {
-          type: 'object',
-          properties: {
-            id: { type: 'number', example: 8 },
-            email: { type: 'string', example: 'vahid@gmail.com' },
-            username: { type: 'string', example: 'vahid-ak' },
-            bio: {
-              type: 'string',
-              example: "It's beginning to build the world!",
-            },
-            image: {
-              type: 'string',
-              example: 'http://unsplash.com/hair-color.png',
-            },
-            token: {
-              type: 'string',
-              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-            },
-          },
+          $ref: '#/components/schemas/UpdateUserDto', // Define this if you want response documentation
         },
       },
     },
@@ -223,7 +201,7 @@ export class UserController {
   @UseGuards(AuthGuard)
   async updateUser(
     @User() user: UserEntity,
-    @Body('user') updateUserDto: UpdateUserDto,
+    @Body('user') updateUserDto: UpdateUserDtoWrapper,
   ): Promise<BuildUserInterface> {
     const updatedUser = await this.userService.updateUser(user, updateUserDto);
     return this.userService.buildUserResponse(updatedUser);

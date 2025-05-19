@@ -136,12 +136,10 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                user:
-                  $ref: '#/components/schemas/UpdateUserDto'
-              example:
-                user:
+              $ref: '#/components/schemas/UpdateUserDto'
+            examples:
+              example1:
+                value:
                   username: john_doe
                   bio: It's beginning to build the world!
                   image: http://unsplash.com/hair-color.png
@@ -154,26 +152,7 @@ paths:
                 type: object
                 properties:
                   user:
-                    type: object
-                    properties:
-                      id:
-                        type: number
-                        example: 8
-                      email:
-                        type: string
-                        example: vahid@gmail.com
-                      username:
-                        type: string
-                        example: vahid-ak
-                      bio:
-                        type: string
-                        example: It's beginning to build the world!
-                      image:
-                        type: string
-                        example: http://unsplash.com/hair-color.png
-                      token:
-                        type: string
-                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                    $ref: '#/components/schemas/UpdateUserDto'
         '401':
           description: Unauthorized - Invalid or missing token
       security:
@@ -385,4 +364,19 @@ components:
       name: Authorization
       description: Enter JWT token
       in: header
-  schemas: {}
+  schemas:
+    UpdateUserDto:
+      type: object
+      properties:
+        username:
+          type: string
+          example: john_doe
+          description: New username
+        bio:
+          type: string
+          example: It's beginning to build the world!
+          description: User biography
+        image:
+          type: string
+          example: http://unsplash.com/hair-color.png
+          description: Profile image URL
