@@ -23,9 +23,11 @@ export class CommentEntity {
   @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: string;
 
-  @ManyToOne(() => StoryEntity, (story) => story.comments)
+  @ManyToOne(() => StoryEntity, (story) => story.comments, {
+    onDelete: 'CASCADE', // Delete comments when story is deleted
+  })
   story: StoryEntity;
-  
+
   @ManyToOne(() => UserEntity, (user) => user.comments)
   owner: UserEntity;
 }
