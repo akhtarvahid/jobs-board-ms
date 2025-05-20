@@ -58,6 +58,19 @@ export class StoryController {
   }
 
   @Get('feed')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Get logged in user all the feed story',
+    description: 'Returns logged in user feed story',
+  })
+  @ApiOkResponse({
+    description: 'Returns all logged in user feed story with count',
+    type: AllStoryResponse,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized: No token provided',
+  })
   @UseGuards(AuthGuard)
   async userStories(
     @User('id') userId: number,

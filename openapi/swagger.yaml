@@ -188,11 +188,21 @@ paths:
       tags: *ref_1
   /story/feed:
     get:
+      description: Returns logged in user feed story
       operationId: StoryController_userStories
       parameters: []
       responses:
         '200':
-          description: ''
+          description: Returns all logged in user feed story with count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllStoryResponse'
+        '401':
+          description: 'Unauthorized: No token provided'
+      security:
+        - JWT-auth: []
+      summary: Get logged in user all the feed story
       tags: *ref_1
   /story/create:
     post:
