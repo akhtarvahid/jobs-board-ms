@@ -9,15 +9,6 @@ paths:
           description: ''
       tags:
         - App
-  /tag:
-    get:
-      operationId: TagController_findAllTags
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-        - Tag
   /user/register:
     post:
       operationId: UserController_createUser
@@ -159,6 +150,54 @@ paths:
         - JWT-auth: []
       summary: Update current user profile
       tags: *ref_0
+  /profile/health:
+    get:
+      operationId: ProfileController_health
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: &ref_1
+        - Profile
+  /profile/{username}:
+    get:
+      operationId: ProfileController_getProfile
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
+  /profile/{username}/follow:
+    post:
+      operationId: ProfileController_followProfile
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: ''
+      tags: *ref_1
+  /profile/{username}/unfollow:
+    delete:
+      operationId: ProfileController_unfollowProfile
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
   /story/health:
     get:
       operationId: StoryController_health
@@ -166,7 +205,7 @@ paths:
       responses:
         '200':
           description: ''
-      tags: &ref_1
+      tags: &ref_2
         - Story
   /story/all:
     get:
@@ -185,7 +224,7 @@ paths:
       security:
         - JWT-auth: []
       summary: Get all the story
-      tags: *ref_1
+      tags: *ref_2
   /story/feed:
     get:
       description: Returns logged in user feed story
@@ -203,7 +242,32 @@ paths:
       security:
         - JWT-auth: []
       summary: Get logged in user all the feed story
-      tags: *ref_1
+      tags: *ref_2
+  /story/{storyId}:
+    get:
+      description: Return a story
+      operationId: StoryController_findAStory
+      parameters:
+        - name: storyId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns a single story
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoryResponse'
+        '401':
+          description: 'Unauthorized: No token provided'
+        '404':
+          description: Story not found!
+      security:
+        - JWT-auth: []
+      summary: Get a story
+      tags: *ref_2
   /story/create:
     post:
       operationId: StoryController_createStory
@@ -211,7 +275,7 @@ paths:
       responses:
         '201':
           description: ''
-      tags: *ref_1
+      tags: *ref_2
   /story/{slug}:
     put:
       operationId: StoryController_updateStory
@@ -224,15 +288,7 @@ paths:
       responses:
         '200':
           description: ''
-      tags: *ref_1
-    get:
-      operationId: CommentController_health
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags: &ref_3
-        - Comment
+      tags: *ref_2
     delete:
       operationId: StoryController_deleteAStory
       parameters:
@@ -244,7 +300,15 @@ paths:
       responses:
         '200':
           description: ''
-      tags: *ref_1
+      tags: *ref_2
+    get:
+      operationId: CommentController_health
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: &ref_3
+        - Comment
   /story/{slug}/like:
     post:
       operationId: StoryController_likeStory
@@ -257,59 +321,11 @@ paths:
       responses:
         '201':
           description: ''
-      tags: *ref_1
+      tags: *ref_2
     delete:
       operationId: StoryController_dislikeStory
       parameters:
         - name: slug
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        '200':
-          description: ''
-      tags: *ref_1
-  /profile/health:
-    get:
-      operationId: ProfileController_health
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags: &ref_2
-        - Profile
-  /profile/{username}:
-    get:
-      operationId: ProfileController_getProfile
-      parameters:
-        - name: username
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        '200':
-          description: ''
-      tags: *ref_2
-  /profile/{username}/follow:
-    post:
-      operationId: ProfileController_followProfile
-      parameters:
-        - name: username
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        '201':
-          description: ''
-      tags: *ref_2
-  /profile/{username}/unfollow:
-    delete:
-      operationId: ProfileController_unfollowProfile
-      parameters:
-        - name: username
           required: true
           in: path
           schema:
@@ -368,6 +384,15 @@ paths:
         '200':
           description: ''
       tags: *ref_3
+  /tag:
+    get:
+      operationId: TagController_findAllTags
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Tag
 info:
   title: TIP Medium Service
   description: A Medium Service Provider
@@ -425,56 +450,12 @@ components:
     StoryResponse:
       type: object
       properties:
-        id:
-          type: string
-          example: 1
-        slug:
-          type: string
-          example: my-story-kdurse
-        title:
-          type: string
-          example: My Story
-        description:
-          type: string
-          example: Story description
-        body:
-          type: string
-          example: Story body content
-        createdAt:
-          format: date-time
-          type: string
-          example: '2025-05-16T12:49:01.866Z'
-        modifiedAt:
-          format: date-time
-          type: string
-          example: '2025-05-16T12:49:01.866Z'
-        tagList:
-          example:
-            - tag1
-            - tag2
-          type: array
-          items:
-            type: string
-        favoritesCount:
-          type: number
-          example: 0
-        owner:
-          $ref: '#/components/schemas/OwnerResponse'
-        favorited:
-          type: boolean
-          example: false
+        story:
+          description: The story object
+          allOf:
+            - $ref: '#/components/schemas/SingleStoryDto'
       required:
-        - id
-        - slug
-        - title
-        - description
-        - body
-        - createdAt
-        - modifiedAt
-        - tagList
-        - favoritesCount
-        - owner
-        - favorited
+        - story
     AllStoryResponse:
       type: object
       properties:
@@ -488,3 +469,90 @@ components:
       required:
         - stories
         - storiesCount
+    StoryOwnerDto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 3
+          description: User ID
+        email:
+          type: string
+          example: john@example.com
+          description: User email
+        username:
+          type: string
+          example: john_doe
+          description: Username
+        bio:
+          type: string
+          example: It's beginning to build the world!
+          description: User bio
+        image:
+          type: string
+          example: http://unsplash.com/hair-color.png
+          description: User profile image URL
+      required:
+        - id
+        - email
+        - username
+    SingleStoryDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8
+          description: Story ID
+        slug:
+          type: string
+          example: advance-js-3-cqa8qf
+          description: URL-friendly story slug
+        title:
+          type: string
+          example: Advance Js 3
+          description: Story title
+        description:
+          type: string
+          example: Did you ever wonder how?
+          description: Short description
+        body:
+          type: string
+          example: Believe it or not!
+          description: Main content body
+        createdAt:
+          format: date-time
+          type: string
+          example: '2025-05-20T11:55:27.690Z'
+          description: Creation timestamp
+        modifiedAt:
+          format: date-time
+          type: string
+          example: '2025-05-20T11:55:27.690Z'
+          description: Last modification timestamp
+        tagList:
+          example:
+            - JS
+            - ES6
+          description: List of tags
+          type: array
+          items:
+            type: string
+        favoritesCount:
+          type: number
+          example: 0
+          description: Number of times story was favorited
+        owner:
+          description: Story owner details
+          allOf:
+            - $ref: '#/components/schemas/StoryOwnerDto'
+      required:
+        - id
+        - slug
+        - title
+        - description
+        - body
+        - createdAt
+        - modifiedAt
+        - tagList
+        - favoritesCount
+        - owner

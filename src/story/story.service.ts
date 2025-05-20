@@ -4,7 +4,7 @@ import { UserEntity } from '@app/user/user.entity';
 import { StoryEntity } from './story.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
-import { StoryResponseInterface } from './types/buildStoryResponse.type';
+import { StoryResponse } from './types/buildStoryResponse.type';
 import slugify from 'slugify';
 import { UpdateStoryDto } from './dto/updateStory.dto';
 import { FollowEntity } from '@app/profile/follow.entity';
@@ -169,10 +169,10 @@ export class StoryService {
 
     return await this.storyRepository.save(story);
   }
-  async findBySlug(slug: string): Promise<StoryEntity> {
+  async findBySlug(storyId: string): Promise<StoryEntity> {
     const story = await this.storyRepository.findOne({
       where: {
-        slug,
+        id: storyId,
       },
     });
     if (!story) {
@@ -251,7 +251,7 @@ export class StoryService {
     );
   }
 
-  buildStoryResponse(response: StoryEntity): StoryResponseInterface {
+  buildStoryResponse(response: StoryEntity): StoryResponse {
     return {
       story: response,
     };
