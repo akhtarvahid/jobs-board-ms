@@ -19,6 +19,13 @@ import { AuthGuard } from '@app/user/guards/auth.guard';
 import { StoryResponseInterface } from './types/buildStoryResponse.type';
 import { UpdateStoryDto } from './dto/updateStory.dto';
 import { GlobalValidationPipe } from '@app/shared/pipes/global-validation.pipe';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
+import { AllStoryResponse } from './types/all-story-response.type';
 
 @Controller('story')
 export class StoryController {
@@ -29,11 +36,24 @@ export class StoryController {
   }
 
   @Get('all')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Get all the story',
+    description: 'Returns all the story of the authenticated user',
+  })
+  @ApiOkResponse({
+    description: 'Returns all stories with count',
+    type: AllStoryResponse,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized: No token provided',
+  })
   @UseGuards(AuthGuard)
   async findAllStory(
     @User('id') userId: number,
     @Query() query: any,
-  ): Promise<any> {
+  ): Promise<AllStoryResponse> {
     return await this.storyService.findAll(userId, query);
   }
 

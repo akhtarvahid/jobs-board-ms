@@ -170,11 +170,21 @@ paths:
         - Story
   /story/all:
     get:
+      description: Returns all the story of the authenticated user
       operationId: StoryController_findAllStory
       parameters: []
       responses:
         '200':
-          description: ''
+          description: Returns all stories with count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllStoryResponse'
+        '401':
+          description: 'Unauthorized: No token provided'
+      security:
+        - JWT-auth: []
+      summary: Get all the story
       tags: *ref_1
   /story/feed:
     get:
@@ -380,3 +390,91 @@ components:
           type: string
           example: http://unsplash.com/hair-color.png
           description: Profile image URL
+    OwnerResponse:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+        email:
+          type: string
+          example: user@example.com
+        username:
+          type: string
+          example: username
+        bio:
+          type: string
+          example: User bio
+        image:
+          type: string
+          example: ''
+      required:
+        - id
+        - email
+        - username
+    StoryResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 1
+        slug:
+          type: string
+          example: my-story-kdurse
+        title:
+          type: string
+          example: My Story
+        description:
+          type: string
+          example: Story description
+        body:
+          type: string
+          example: Story body content
+        createdAt:
+          format: date-time
+          type: string
+          example: '2025-05-16T12:49:01.866Z'
+        modifiedAt:
+          format: date-time
+          type: string
+          example: '2025-05-16T12:49:01.866Z'
+        tagList:
+          example:
+            - tag1
+            - tag2
+          type: array
+          items:
+            type: string
+        favoritesCount:
+          type: number
+          example: 0
+        owner:
+          $ref: '#/components/schemas/OwnerResponse'
+        favorited:
+          type: boolean
+          example: false
+      required:
+        - id
+        - slug
+        - title
+        - description
+        - body
+        - createdAt
+        - modifiedAt
+        - tagList
+        - favoritesCount
+        - owner
+        - favorited
+    AllStoryResponse:
+      type: object
+      properties:
+        stories:
+          type: array
+          items:
+            $ref: '#/components/schemas/StoryResponse'
+        storiesCount:
+          type: number
+          example: 5
+      required:
+        - stories
+        - storiesCount

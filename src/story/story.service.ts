@@ -8,6 +8,7 @@ import { StoryResponseInterface } from './types/buildStoryResponse.type';
 import slugify from 'slugify';
 import { UpdateStoryDto } from './dto/updateStory.dto';
 import { FollowEntity } from '@app/profile/follow.entity';
+import { AllStoryResponse } from './types/all-story-response.type';
 
 @Injectable()
 export class StoryService {
@@ -21,7 +22,7 @@ export class StoryService {
     private dataSource: DataSource,
   ) {}
 
-  async findAll(userId: number, query: any): Promise<any> {
+  async findAll(userId: number, query: any): Promise<AllStoryResponse> {
     const queryBuilder = this.dataSource
       .getRepository(StoryEntity)
       .createQueryBuilder('storyQuery')
