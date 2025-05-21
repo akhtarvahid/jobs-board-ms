@@ -283,12 +283,13 @@ paths:
             examples:
               example1:
                 value:
-                  title: EcmaScript
-                  description: Learn modern js
-                  body: official doc or jsdev
-                  tagList:
-                    - JS
-                    - ES6
+                  story:
+                    title: EcmaScript
+                    description: Learn modern js
+                    body: official doc or jsdev
+                    tagList:
+                      - JS
+                      - ES6
       responses:
         '400':
           description: Bad request
@@ -300,6 +301,7 @@ paths:
       tags: *ref_2
   /story/{slug}:
     put:
+      description: Token is required to update a story
       operationId: StoryController_updateStory
       parameters:
         - name: slug
@@ -307,9 +309,28 @@ paths:
           in: path
           schema:
             type: string
+      requestBody:
+        required: true
+        description: Provider mandatory details to update the story
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStoryDto'
+            examples:
+              example1:
+                value:
+                  story:
+                    title: EcmaScript
+                    description: Learn modern js
+                    body: official doc or jsdev
       responses:
-        '200':
-          description: ''
+        '400':
+          description: Bad request
+        '404':
+          description: Story not found!
+      security:
+        - JWT-auth: []
+      summary: Update a story
       tags: *ref_2
     delete:
       operationId: StoryController_deleteAStory
@@ -623,7 +644,30 @@ components:
     CreateStoryDto:
       type: object
       properties:
-        user:
+        story:
           $ref: '#/components/schemas/CreateStory'
       required:
-        - user
+        - story
+    UpdateStory:
+      type: object
+      properties:
+        title:
+          type: string
+          example: title
+        description:
+          type: string
+          example: description
+        body:
+          type: string
+          example: body
+      required:
+        - title
+        - description
+        - body
+    UpdateStoryDto:
+      type: object
+      properties:
+        story:
+          $ref: '#/components/schemas/UpdateStory'
+      required:
+        - story

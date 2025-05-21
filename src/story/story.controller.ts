@@ -100,7 +100,7 @@ export class StoryController {
   })
   @UseGuards(AuthGuard)
   async findAStory(@Param('storyId') storyId: string): Promise<StoryResponse> {
-    const story = await this.storyService.findBySlug(storyId);
+    const story = await this.storyService.findById(storyId);
     return this.storyService.buildStoryResponse(story);
   }
 
@@ -116,10 +116,12 @@ export class StoryController {
     examples: {
       example1: {
         value: {
-          title: 'EcmaScript',
-          description: 'Learn modern js',
-          body: 'official doc or jsdev',
-          tagList: ['JS', 'ES6'],
+          story: {
+            title: 'EcmaScript',
+            description: 'Learn modern js',
+            body: 'official doc or jsdev',
+            tagList: ['JS', 'ES6'],
+          },
         },
       },
     },
@@ -143,6 +145,34 @@ export class StoryController {
   }
 
   @Put(':slug')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Update a story',
+    description: 'Token is required to update a story',
+  })
+  @ApiBody({
+    description: 'Provider mandatory details to update the story',
+    type: UpdateStoryDto,
+    examples: {
+      example1: {
+        value: {
+          story: {
+            title: 'EcmaScript',
+            description: 'Learn modern js',
+            body: 'official doc or jsdev',
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Story not found!',
+  })
   @UseGuards(AuthGuard)
   @UsePipes(new ValidationPipe())
   async updateStory(

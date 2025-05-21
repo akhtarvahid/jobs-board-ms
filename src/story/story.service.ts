@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { CreateStoryDto } from './dto/createStory.dto';
 import { UserEntity } from '@app/user/user.entity';
 import { StoryEntity } from './story.entity';
@@ -150,7 +155,7 @@ export class StoryService {
     story.slug = this.getSlug(story.title);
     story.owner = user;
 
-    return this.storyRepository.save(story);
+    return await this.storyRepository.save(story);
   }
   async updateStory(
     updateStoryDto: UpdateStoryDto,
@@ -158,18 +163,36 @@ export class StoryService {
     user: UserEntity,
   ): Promise<StoryEntity> {
     const story = await this.findBySlug(slug);
-    if (story.owner.id !== user.id) {
+    if (story && story.owner.id !== user.id) {
       throw new HttpException(
         'You are not authorized to perform',
-        HttpStatus.BAD_REQUEST, // check and change
+        HttpStatus.BAD_REQUEST,
       );
     }
 
+    if (Object.keys(updateStoryDto).length === 0) {
+      throw new HttpException(
+        'Request body cannot be empty',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     Object.assign(story, updateStoryDto);
 
     return await this.storyRepository.save(story);
   }
-  async findBySlug(storyId: string): Promise<StoryEntity> {
+  async findBySlug(slug: string): Promise<StoryEntity> {
+    const story = await this.storyRepository.findOne({
+      where: {
+        slug,
+      },
+    });
+    if (!story) {
+      throw new HttpException('Story not found!', HttpStatus.NOT_FOUND);
+    }
+
+    return story;
+  }
+  async findById(storyId: string): Promise<StoryEntity> {
     const story = await this.storyRepository.findOne({
       where: {
         id: storyId,

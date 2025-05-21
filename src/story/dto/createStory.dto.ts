@@ -60,5 +60,5 @@ export class CreateStoryDto {
     type: CreateStory,
   })
   @ValidateNested()
-  user: CreateStory;
+  story: CreateStory;
 }
