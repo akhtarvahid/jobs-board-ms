@@ -270,11 +270,33 @@ paths:
       tags: *ref_2
   /story/create:
     post:
+      description: Token is required to create a story
       operationId: StoryController_createStory
       parameters: []
+      requestBody:
+        required: true
+        description: Story details to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStoryDto'
+            examples:
+              example1:
+                value:
+                  title: EcmaScript
+                  description: Learn modern js
+                  body: official doc or jsdev
+                  tagList:
+                    - JS
+                    - ES6
       responses:
-        '201':
-          description: ''
+        '400':
+          description: Bad request
+        '404':
+          description: Story not found!
+      security:
+        - JWT-auth: []
+      summary: Create a story
       tags: *ref_2
   /story/{slug}:
     put:
@@ -556,3 +578,52 @@ components:
         - tagList
         - favoritesCount
         - owner
+    CreateStory:
+      type: object
+      properties:
+        title:
+          type: string
+          example: EcmaScript
+        description:
+          type: string
+          example: Learn modern js ecmaScript
+        body:
+          type: string
+          example: ecmaScript from official doc
+        tagList:
+          example:
+            - tag1
+            - tag2
+          type: array
+          items:
+            type: string
+        createdAt:
+          format: date-time
+          type: string
+          example: '2025-05-16T12:49:01.866Z'
+          default: '2025-05-16T12:49:01.866Z'
+        updatedAt:
+          format: date-time
+          type: string
+          example: '2025-05-16T12:49:01.866Z'
+          default: '2025-05-16T12:49:01.866Z'
+        favorited:
+          type: boolean
+          example: false
+          default: false
+        favoritesCount:
+          type: number
+          example: 0
+          default: 0
+      required:
+        - title
+        - description
+        - body
+        - tagList
+    CreateStoryDto:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/CreateStory'
+      required:
+        - user

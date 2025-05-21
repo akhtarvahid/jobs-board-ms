@@ -161,7 +161,7 @@ export class StoryService {
     if (story.owner.id !== user.id) {
       throw new HttpException(
         'You are not authorized to perform',
-        HttpStatus.BAD_GATEWAY, // check and change
+        HttpStatus.BAD_REQUEST, // check and change
       );
     }
 

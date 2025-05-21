@@ -21,6 +21,7 @@ import { UpdateStoryDto } from './dto/updateStory.dto';
 import { GlobalValidationPipe } from '@app/shared/pipes/global-validation.pipe';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
@@ -104,6 +105,33 @@ export class StoryController {
   }
 
   @Post('create')
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Create a story',
+    description: 'Token is required to create a story',
+  })
+  @ApiBody({
+    description: 'Story details to create',
+    type: CreateStoryDto,
+    examples: {
+      example1: {
+        value: {
+          title: 'EcmaScript',
+          description: 'Learn modern js',
+          body: 'official doc or jsdev',
+          tagList: ['JS', 'ES6'],
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Story not found!',
+  })
   @UseGuards(AuthGuard)
   @UsePipes(new ValidationPipe())
   async createStory(
