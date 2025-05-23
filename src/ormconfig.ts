@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 const getTypeOrmConfig: PostgresConnectionOptions = {
   type: 'postgres',
-  host: process.env.DB_HOST, // 'db' in Docker, 'localhost' in dev
+  host: process.env.DB_HOST,
   port: parseInt(process.env.DB_PORT || '5056'),
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,

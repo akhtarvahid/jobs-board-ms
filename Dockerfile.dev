@@ -1,13 +1,13 @@
-FROM node:18-alpine
+# Development-specific Dockerfile
+FROM node:22-alpine as development
 
 WORKDIR /app
-
 COPY package*.json ./
-
 RUN npm install
-
 COPY . .
 
+# Copy and set up entrypoint (for dev-specific tasks)
 COPY docker-entrypoint.sh .
 RUN chmod +x docker-entrypoint.sh
+
 ENTRYPOINT ["./docker-entrypoint.sh"]

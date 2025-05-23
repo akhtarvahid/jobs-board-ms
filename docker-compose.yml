@@ -23,12 +23,14 @@ services:
   nestjs-app:
     build:
       context: .
-      dockerfile: Dockerfile
+      target: development
+      dockerfile: Dockerfile.dev
     env_file: .env
     environment:
       - PORT=3000
       - DB_HOST=db
       - DB_PORT=5432
+      - NODE_ENV=development
     ports:
       - '3000:3000'
     depends_on:
@@ -36,6 +38,7 @@ services:
         condition: service_healthy
     volumes:
       - ./src:/app/src
+      - /app/node_modules
 
 volumes:
   pgdata:
