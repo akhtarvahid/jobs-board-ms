@@ -39,6 +39,16 @@ services:
     volumes:
       - ./src:/app/src
       - /app/node_modules
+    profiles: ["dev"]
+
+  app-prod:
+    image: your-registry/nest-app:${TAG:-latest} # 👈 update this once image is hosted on dockerhub registry
+    env_file: .env.prod
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["prod"] # 👈 Only activates with --profile prod    
 
 volumes:
   pgdata:
