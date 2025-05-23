@@ -42,9 +42,21 @@ services:
     profiles: ["dev"]
 
   app-prod:
-    image: your-registry/nest-app:${TAG:-latest} # 👈 update this once image is hosted on dockerhub registry
+    container_name: nest-prod-app
+    # image: your-registry/nest-app:${TAG:-latest} # 👈 update this once image is hosted on dockerhub registry
+    build: 
+     context: .
+     target: production
+     dockerfile: Dockerfile.prod
     env_file: .env.prod
+    environment:
+      - PORT=8000
+      - DB_HOST=db
+      - DB_PORT=5432
+      - NODE_ENV=production
     restart: unless-stopped
+    ports:
+      - '8000:8000'
     depends_on:
       db:
         condition: service_healthy
