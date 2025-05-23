@@ -11,10 +11,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe());
 
-  swaggerConfig(app);
-  console.log(`App running on port: 3000`);
-  console.log(`Swagger is live - http://localhost:3000/api#/`);
+  const port = parseInt(process.env.PORT || '3000', 10);
+  const host = process.env.NODE_ENV === 'production' ? '0.0.0.0' : '0.0.0.0'; // Always use 0.0.0.0 for Docker
 
-  await app.listen(process.env.PORT ?? 3000);
+  swaggerConfig(app);
+  
+  await app.listen(port, host);
+  
+  console.log(`🚀 Server running on port ${port}`);
+  console.log(`📄 Swagger: http://0.0.0.0:${port}/api`);
 }
 bootstrap();
