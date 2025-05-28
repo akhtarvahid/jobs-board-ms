@@ -81,7 +81,7 @@ const Article = () => {
           />
         </div>
 
-        <Comments slug={slug} isAuth={isAuth} user={newUserData?.user} />
+        <Comments slug={story?.story?.slug} isAuth={isAuth} user={newUserData?.user} />
       </div>
     </div>
   );

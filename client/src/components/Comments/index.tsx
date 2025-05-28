@@ -38,15 +38,16 @@ const Comments = ({ slug, isAuth, user }: any) => {
   //   // deleteComment,
   // } = useComment({ slug });
     const { data: storyComments } = useGetStory(`/story/${slug}/comment`);
-  console.log('commetns', storyComments);
+  console.log('commetns', storyComments, isAuth);
 
   const comments = storyComments?.comments;
 
 
 
-  const { createComment: newCreateComment, loading } = useNewComment(`/story/${slug}/comment`);
+  const { create: newCreateComment, loading } = useNewComment(`/story/${slug}/comment`);
 
   const onSubmit: SubmitHandler<Inputs> = async (data: any) => {
+    console.log('created comment', slug)
     try {
       if (slug) {
        await newCreateComment(data)
