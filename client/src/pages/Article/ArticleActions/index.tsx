@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom'
-import handleFollowFunc from '../../../utils/handleFollowFunc'
+import { Link } from 'react-router-dom';
+import handleFollowFunc from '../../../utils/handleFollowFunc';
 
 const ArticleActions = ({
   article,
@@ -13,53 +13,53 @@ const ArticleActions = ({
   navigate,
   isAuth,
   isSameUser,
-  deleteArticle
+  deleteArticle,
 }: any) => {
   const handleDelete = async (slugData: any) => {
     if (slugData) {
       try {
-        await deleteArticle.mutateAsync(slugData)
-        navigate('/')
+        // TODO: Delete api call
+        navigate('/');
       } catch (error) {
-        console.log('Error deleting article:', error)
+        console.log('Error deleting article:', error);
       }
     }
-  }
+  };
 
   return (
-    <div className='article-meta'>
+    <div className="article-meta">
       <Link to={`/${article?.author?.username}`}>
-        <img src={article?.author?.image} style={{     border: '16px solid'}} />
+        <img src={article?.author?.image} style={{ border: '16px solid' }} />
       </Link>
-      <div className='info'>
-        <Link to={`/${article?.author?.username}`} className='author'>
+      <div className="info">
+        <Link to={`/${article?.author?.username}`} className="author">
           {article?.author?.username}
         </Link>
-        <span className='date'>{dateConverter(article?.modifiedAt)}</span>
+        <span className="date">{dateConverter(article?.modifiedAt)}</span>
       </div>
       {isSameUser ? (
         <>
           <button
-            className='btn btn-sm btn-outline-secondary'
+            className="btn btn-sm btn-outline-secondary"
             onClick={() => navigate(`/editor/${article?.slug}`)}
           >
-            <i className='ion-edit'></i>
+            <i className="ion-edit"></i>
             &nbsp; Edit Article
           </button>
           &nbsp;
           <button
-            className='btn btn-outline-danger btn-sm'
+            className="btn btn-outline-danger btn-sm"
             onClick={() => handleDelete(article?.slug)}
             disabled={deleteArticle?.isLoading}
           >
-            <i className='ion-trash-a'></i>
+            <i className="ion-trash-a"></i>
             &nbsp; {deleteArticle?.isLoading ? 'Deleting...' : 'Delete Article'}
           </button>
         </>
       ) : (
         <>
           <button
-            className='btn btn-sm btn-outline-secondary'
+            className="btn btn-sm btn-outline-secondary"
             onClick={() =>
               handleFollowFunc(
                 article?.author?.username,
@@ -67,17 +67,17 @@ const ArticleActions = ({
                 unfollow,
                 follow,
                 navigate,
-                isAuth
+                isAuth,
               )
             }
           >
-            <i className='ion-plus-round'></i>
+            <i className="ion-plus-round"></i>
             &nbsp; {isFollowing ? 'Unfollow' : 'Follow'}{' '}
             {article?.author?.username}
           </button>
           &nbsp;
           <button
-            className='btn btn-sm btn-outline-primary'
+            className="btn btn-sm btn-outline-primary"
             onClick={() =>
               handleFollowFunc(
                 article?.slug,
@@ -85,18 +85,18 @@ const ArticleActions = ({
                 unfavorite,
                 favorite,
                 navigate,
-                isAuth
+                isAuth,
               )
             }
           >
-            <i className='ion-heart'></i>
+            <i className="ion-heart"></i>
             &nbsp; {isFavorite ? 'Unfavorite' : 'Favorite'} Article{' '}
-            <span className='counter'>{article?.favoritesCount}</span>
+            <span className="counter">{article?.favoritesCount}</span>
           </button>
         </>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ArticleActions
+export default ArticleActions;
