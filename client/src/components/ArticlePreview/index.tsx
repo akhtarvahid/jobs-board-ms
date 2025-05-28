@@ -1,6 +1,6 @@
-import { Link, useNavigate } from 'react-router-dom'
-import dateConverter from '../../utils/dateConverter'
-import { useLikeStory } from '../../hooks/useFetchArticles'
+import { Link } from 'react-router-dom';
+import dateConverter from '../../utils/dateConverter';
+import { useLikeStory } from '../../hooks/useFetchArticles';
 
 const ArticlePreview = (props: any) => {
   const {
@@ -11,60 +11,50 @@ const ArticlePreview = (props: any) => {
     slug,
     tagList,
     title,
-    isAuth,
-    favorited
-  } = props
-  const navigate = useNavigate()
-  // const { favorite, unfavorite } = useArticle({ slug })
+  } = props;
 
-  
-  const { data, likeStory } = useLikeStory(`/story/${slug}/like`);
+  const { likeStory } = useLikeStory(`/story/${slug}/like`);
   const likeStoryHandler = () => {
-    console.log('liked')
-    // handleFollowFunc(
-    //           slug,
-    //           favorited,
-    //           unfavorite,
-    //           favorite,
-    //           navigate,
-    //           isAuth
-    //         )
-            likeStory();
-  }
+    console.log('liked');
+    likeStory();
+  };
   return (
-    <div className='article-preview'>
-      <div className='article-meta'>
+    <div className="article-preview">
+      <div className="article-meta">
         <Link to={`/${author?.username}`}>
           <img src={author?.image} />
-          <div className='info'>
-            <a href='' className='author'>
+          <div className="info">
+            <a href="" className="author">
               {author?.username}
             </a>
-            <span className='date'>{dateConverter(modifiedAt)}</span>
+            <span className="date">{dateConverter(modifiedAt)}</span>
           </div>
         </Link>
         <button
-          className='btn btn-outline-primary btn-sm pull-xs-right'
+          className="btn btn-outline-primary btn-sm pull-xs-right"
           onClick={likeStoryHandler}
         >
-          <i className='ion-heart'></i> {favoritesCount}
+          <i className="ion-heart"></i> {favoritesCount}
         </button>
       </div>
-      <Link to={`/article/${slug}`} className='preview-link'>
+      <Link to={`/article/${props.id}`} className="preview-link">
         <h1>{title}</h1>
         <p>{description}</p>
         <span>Read more...</span>
-        <ul className='tag-list'>
+        <ul className="tag-list">
           {tagList &&
             tagList.map((tag: string, i: number) => (
-              <li  key={`${tag} - ${i}`} className='tag-default tag-pill tag-outline ng-binding ng-scope'>
+              <li
+                key={`${tag} - ${i}`}
+                className="tag-default tag-pill tag-outline ng-binding ng-scope"
+              >
                 {tag}
               </li>
             ))}
         </ul>
       </Link>
     </div>
-  )
-}
+  );
+};
 
-export default ArticlePreview
+export default ArticlePreview;
