@@ -1,12 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom'
 import dateConverter from '../../utils/dateConverter'
-import handleFollowFunc from '../../utils/handleFollowFunc'
-import useArticle from '../../hooks/useArticle'
+import { useLikeStory } from '../../hooks/useFetchArticles'
 
 const ArticlePreview = (props: any) => {
   const {
     author,
-    updatedAt,
+    modifiedAt,
     description,
     favoritesCount,
     slug,
@@ -16,8 +15,22 @@ const ArticlePreview = (props: any) => {
     favorited
   } = props
   const navigate = useNavigate()
-  const { favorite, unfavorite } = useArticle({ slug })
+  // const { favorite, unfavorite } = useArticle({ slug })
 
+  
+  const { data, likeStory } = useLikeStory(`/story/${slug}/like`);
+  const likeStoryHandler = () => {
+    console.log('liked')
+    // handleFollowFunc(
+    //           slug,
+    //           favorited,
+    //           unfavorite,
+    //           favorite,
+    //           navigate,
+    //           isAuth
+    //         )
+            likeStory();
+  }
   return (
     <div className='article-preview'>
       <div className='article-meta'>
@@ -27,21 +40,12 @@ const ArticlePreview = (props: any) => {
             <a href='' className='author'>
               {author?.username}
             </a>
-            <span className='date'>{dateConverter(updatedAt)}</span>
+            <span className='date'>{dateConverter(modifiedAt)}</span>
           </div>
         </Link>
         <button
           className='btn btn-outline-primary btn-sm pull-xs-right'
-          onClick={() =>
-            handleFollowFunc(
-              slug,
-              favorited,
-              unfavorite,
-              favorite,
-              navigate,
-              isAuth
-            )
-          }
+          onClick={likeStoryHandler}
         >
           <i className='ion-heart'></i> {favoritesCount}
         </button>
@@ -52,8 +56,8 @@ const ArticlePreview = (props: any) => {
         <span>Read more...</span>
         <ul className='tag-list'>
           {tagList &&
-            tagList.map((tag: string) => (
-              <li className='tag-default tag-pill tag-outline ng-binding ng-scope'>
+            tagList.map((tag: string, i: number) => (
+              <li  key={`${tag} - ${i}`} className='tag-default tag-pill tag-outline ng-binding ng-scope'>
                 {tag}
               </li>
             ))}

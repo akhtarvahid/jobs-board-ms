@@ -25,7 +25,7 @@ const Header: React.FC = () => {
         </NavLink>
         <ul className='nav navbar-nav pull-xs-right'>
           {navLinks.map(({ to, name, icon }) => (
-            <li className='nav-item'>
+            <li className='nav-item' key={name}>
               {to === '/username' ? (
                 <span className='nav-link'>{name}</span>
               ) : (

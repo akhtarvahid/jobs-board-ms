@@ -37,7 +37,7 @@ const useUserAuth = ({ reset }: any) => {
 
   const loginUser = (data: Login): Promise<any> =>
     request
-      .post('/users/login', data)
+      .post('/user/login', data)
       .then((res) => res.data)
       .catch((err) => {
         setRegisterErr(err)

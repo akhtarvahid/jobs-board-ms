@@ -35,7 +35,7 @@ type ArtilceType = {
 
 const getArticles = (params: ParamsType) =>
   request
-    .get('/articles', {
+    .get('/story/all', {
       params
     })
     .then((res) => res.data)

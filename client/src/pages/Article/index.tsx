@@ -6,20 +6,24 @@ import { RootState } from '../../store'
 import Comments from '../../components/Comments'
 import useProfile from '../../hooks/useProfile'
 import ArticleActions from './ArticleActions'
+import { useGetStory } from '../../hooks/useFetchArticles'
 
 const Article = () => {
   const { slug } = useParams()
   const navigate = useNavigate()
   const { follow, unfollow, userData } = useProfile({ slug: slug })
   const {
-    article: articleData,
+    // article: articleDataa,
     favorite,
     unfavorite,
     deleteArticle
   } = useArticle({ slug })
+      const { data: story } = useGetStory(`/story/${slug}`);
+      console.log('Story - -- - - - ', story)
+
   const { token } = useSelector((state: RootState) => state.userAuth)
   const isAuth = !!token
-  const article = articleData?.article
+  const article = story?.story
   const isFollowing = article?.author?.following
   const isFavorite = article?.favorited
   const isSameUser = article?.author?.username === userData?.user?.username
@@ -29,7 +33,6 @@ const Article = () => {
       <div className='banner'>
         <div className='container'>
           <h1>{article?.title}</h1>
-
           <ArticleActions
             isSameUser={isSameUser}
             article={article}
@@ -56,8 +59,8 @@ const Article = () => {
 
         <ul className='tag-list'>
           {article?.tagList &&
-            article?.tagList.map((tag: string) => (
-              <li className='tag-default tag-pill tag-outline ng-binding ng-scope'>
+            article?.tagList.map((tag: string, i: number) => (
+              <li  key={`${tag} - ${i}`} className='tag-default tag-pill tag-outline ng-binding ng-scope'>
                 {tag}
               </li>
             ))}

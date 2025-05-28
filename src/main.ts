@@ -4,11 +4,12 @@ if (!process.env.IS_TS_NODE) {
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { swaggerConfig } from './config/swagger.config';
-import { GlobalValidationPipe } from './shared/pipes/global-validation.pipe';
+import { ValidationPipe } from '@nestjs/common';
+// import { GlobalValidationPipe } from './shared/pipes/global-validation.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new GlobalValidationPipe());
+  app.useGlobalPipes(new ValidationPipe());
  // Enable CORS for local development
   app.enableCors({
     origin: 'http://localhost:5173', // Your React app's URL

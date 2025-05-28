@@ -1,97 +1,101 @@
-import { useSelector } from 'react-redux'
-import { RootState } from '../../store'
-import ArticlePreview from '../../components/ArticlePreview'
-import useArticle from '../../hooks/useArticle'
-import { useState } from 'react'
-import ReactPaginate from 'react-paginate'
-import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
+import ArticlePreview from '../../components/ArticlePreview';
+import useArticle from '../../hooks/useArticle';
+import { useState } from 'react';
+import ReactPaginate from 'react-paginate';
+import { Link } from 'react-router-dom';
+import { useGetStory } from '../../hooks/useFetchArticles';
 
 const Home = () => {
-  const { token } = useSelector((state: RootState) => state.userAuth)
-  const isAuth = !!token
-  const [offset, setOffset] = useState(0)
-  const [tag, setTag] = useState()
-  const defaultActive = isAuth ? 'local' : 'global'
-  const [active, setActive] = useState(defaultActive)
-  const [currentPage, setCurrentPage] = useState(0)
-
+  const { token } = useSelector((state: RootState) => state.userAuth);
+  const isAuth = !!token;
+  const [offset, setOffset] = useState(0);
+  const [tag, setTag] = useState();
+  const defaultActive = isAuth ? 'local' : 'global';
+  const [active, setActive] = useState(defaultActive);
+  const [currentPage, setCurrentPage] = useState(0);
+  const { data: stories } = useGetStory('/story/all');
+  const { data: storiesFeed } = useGetStory('/story/feed');
+  console.log('DATA- - - -  -> ', storiesFeed);
   const {
-    articles,
     isArticlesLoading,
-    articlesLocal,
+
     isLocalArticlesLoading,
     tags,
-    isTagsLoading
+    isTagsLoading,
   } = useArticle({
     limit: 10,
     offset: offset,
     tag: tag,
-    token: token
-  })
-  const articlesData =
-    active === 'local' ? articlesLocal?.articles : articles?.articles
-  const isLoading = isArticlesLoading || isLocalArticlesLoading
+    token: token,
+  });
+  const articlesData = active === 'local' ? storiesFeed?.stories : stories?.stories;
+
+  const isLoading = isArticlesLoading || isLocalArticlesLoading;
   const pageCount = Math.ceil(
     (active === 'local'
-      ? articlesLocal?.articlesCount
-      : articles?.articlesCount) / 10
-  )
+      ? storiesFeed?.storiesCount || 0
+      : stories?.storiesCount || 0) / 10,
+  );
   const handlePageClick = (e: any) => {
-    setOffset(e.selected * 10)
-    setCurrentPage(e.selected)
-  }
+    setOffset(e.selected * 10);
+    setCurrentPage(e.selected);
+  };
 
   const tabClick = (tag: any, tab: any) => {
-    setOffset(0)
-    setCurrentPage(0)
-    setTag(tag)
-    setActive(tab)
-  }
+    setOffset(0);
+    setCurrentPage(0);
+    setTag(tag);
+    setActive(tab);
+  };
+
+  console.log('AFSF', articlesData);
 
   return (
-    <div className='home-page'>
+    <div className="home-page">
       {!isAuth && (
-        <div className='banner'>
-          <div className='container'>
-            <h1 className='logo-font'>conduit</h1>
+        <div className="banner">
+          <div className="container">
+            <h1 className="logo-font">conduit</h1>
             <p>A place to share your knowledge.</p>
           </div>
         </div>
       )}
 
-      <div className='container page'>
-        <div className='row'>
-          <div className='col-md-9'>
-            <div className='feed-toggle'>
-              <ul className='nav nav-pills outline-active'>
+      <div className="container page">
+        <div className="row">
+          <div className="col-md-9">
+            <div className="feed-toggle">
+              <ul className="nav nav-pills outline-active">
                 {isAuth && (
-                  <li className='nav-item'>
+                  <li className="nav-item">
                     <Link
                       className={`nav-link ${
                         active === 'local' ? 'active' : ''
                       }`}
                       onClick={() => tabClick(undefined, 'local')}
-                      to='/'
+                      to="/"
                     >
                       Your Feed
                     </Link>
                   </li>
                 )}
-                <li className='nav-item'>
+                <li className="nav-item">
                   <Link
                     className={`nav-link ${
                       active === 'global' ? 'active' : ''
                     }`}
                     onClick={() => tabClick(undefined, 'global')}
-                    to='/'
+                    to="/"
                   >
                     Global Feed
                   </Link>
                 </li>
                 {tag && (
-                  <li className='nav-item'>
+                  <li className="nav-item">
                     <a className={`nav-link ${active === tag ? 'active' : ''}`}>
-                      <i className='ion-pound'></i>
+                      <i className="ion-pound"></i>
                       {tag}
                     </a>
                   </li>
@@ -115,17 +119,18 @@ const Home = () => {
               ))}
           </div>
 
-          <div className='col-md-3'>
-            <div className='sidebar'>
+          <div className="col-md-3">
+            <div className="sidebar">
               <p>Popular Tags</p>
 
               {isTagsLoading && <p>Loading tags...</p>}
 
-              <div className='tag-list'>
+              <div className="tag-list">
                 {tags &&
-                  tags.map((tagItem: any) => (
+                  tags.map((tagItem: any, i: number) => (
                     <p
-                      className='tag-pill tag-default'
+                      key={`${tagItem.id} - ${i}`}
+                      className="tag-pill tag-default"
                       style={{ cursor: 'pointer' }}
                       onClick={() => tabClick(tagItem, tagItem)}
                     >
@@ -138,30 +143,30 @@ const Home = () => {
 
           {!isLoading && (
             <ReactPaginate
-              breakLabel='...'
-              nextLabel='next >'
+              breakLabel="..."
+              nextLabel="next >"
               onPageChange={handlePageClick}
               pageRangeDisplayed={5}
               pageCount={pageCount}
-              previousLabel='< previous'
+              previousLabel="< previous"
               renderOnZeroPageCount={null}
-              breakClassName='page-item'
-              breakLinkClassName='page-link'
-              containerClassName='pagination justify-content-center'
-              pageClassName='page-item'
-              pageLinkClassName='page-link'
-              previousClassName='page-item'
-              previousLinkClassName='page-link'
-              nextClassName='page-item'
-              nextLinkClassName='page-link'
-              activeClassName='active'
+              breakClassName="page-item"
+              breakLinkClassName="page-link"
+              containerClassName="pagination justify-content-center"
+              pageClassName="page-item"
+              pageLinkClassName="page-link"
+              previousClassName="page-item"
+              previousLinkClassName="page-link"
+              nextClassName="page-item"
+              nextLinkClassName="page-link"
+              activeClassName="active"
               forcePage={currentPage}
             />
           )}
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

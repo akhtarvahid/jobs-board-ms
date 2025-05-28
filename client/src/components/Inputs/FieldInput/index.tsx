@@ -32,8 +32,8 @@ const FieldInput = ({
       )}
       {name === 'article.tagList' && slug && (
         <div className='tag-list'>
-          {tags.map((tag: string) => (
-            <span className='tag-default tag-pill ng-binding ng-scope'>
+          {tags.map((tag: string, i: number) => (
+            <span  key={`${tag} - ${i}`} className='tag-default tag-pill ng-binding ng-scope'>
               <i
                 className='ion-close-round'
                 onClick={() => handleClick(tag)}

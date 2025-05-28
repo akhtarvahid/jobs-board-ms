@@ -1,86 +1,90 @@
-import { SubmitHandler, useForm } from 'react-hook-form'
-import useComment from '../../hooks/useComment'
-import useProfile from '../../hooks/useProfile'
-import dateConverter from '../../utils/dateConverter'
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { SubmitHandler, useForm } from 'react-hook-form';
+import useComment from '../../hooks/useComment';
+import useProfile from '../../hooks/useProfile';
+import dateConverter from '../../utils/dateConverter';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useGetStory } from '../../hooks/useFetchArticles';
 
 type Inputs = {
   comment: {
-    body: string
-  }
-}
+    body: string;
+  };
+};
 
 const Comments = ({ slug, isAuth }: any) => {
   const [deletingCommentId, setDeletingCommentId] = useState<string | null>(
-    null
-  )
+    null,
+  );
   const {
     register,
     handleSubmit,
     formState: { errors },
-    reset
+    reset,
   } = useForm<Inputs>({
     defaultValues: {
       comment: {
-        body: ''
-      }
+        body: '',
+      },
     },
-    mode: 'onChange'
-  })
-  const { userData } = useProfile({})
+    mode: 'onChange',
+  });
+  const { userData } = useProfile({});
   const {
     comments: commentsData,
     createComment,
-    deleteComment
-  } = useComment({ slug })
-  const comments = commentsData?.comments
-  const user = userData?.user
+    deleteComment,
+  } = useComment({ slug });
+  const comments = commentsData?.comments;
+  const user = userData?.user;
+
+  const { data: storyComments } = useGetStory(`/story/${slug}/comment`);
+  console.log('commetns', storyComments);
 
   const onSubmit: SubmitHandler<Inputs> = async (data: any) => {
     try {
       if (slug) {
-        const res = await createComment.mutateAsync(data)
+        const res = await createComment.mutateAsync(data);
         if (res) {
-          reset()
+          reset();
         }
       }
     } catch (error) {
-      console.log('createErr: ', error)
+      console.log('createErr: ', error);
     }
-  }
+  };
 
   const handleDeleteComment = async (id: any) => {
-    setDeletingCommentId(id)
+    setDeletingCommentId(id);
     if (!deleteComment.isLoading)
       try {
-        await deleteComment.mutateAsync(id)
+        await deleteComment.mutateAsync(id);
       } catch (error) {
-        console.log('deleteErr: ', error)
+        console.log('deleteErr: ', error);
       }
-  }
+  };
   return (
     <>
-      <div className='row'>
-        <div className='col-xs-12 col-md-8 offset-md-2'>
+      <div className="row">
+        <div className="col-xs-12 col-md-8 offset-md-2">
           {isAuth ? (
             <form
-              className='card comment-form'
+              className="card comment-form"
               onSubmit={handleSubmit(onSubmit)}
             >
-              <div className='card-block'>
+              <div className="card-block">
                 <textarea
-                  className='form-control'
-                  placeholder='Write a comment...'
+                  className="form-control"
+                  placeholder="Write a comment..."
                   rows={3}
                   {...register('comment.body', { required: true })}
                 ></textarea>
                 {errors.comment && <span>This field is required</span>}
               </div>
-              <div className='card-footer'>
-                <img src={user?.image} className='comment-author-img' />
+              <div className="card-footer">
+                <img src={user?.image} className="comment-author-img" />
                 <button
-                  className='btn btn-sm btn-primary'
+                  className="btn btn-sm btn-primary"
                   disabled={createComment.isLoading}
                 >
                   Post Comment
@@ -88,11 +92,11 @@ const Comments = ({ slug, isAuth }: any) => {
               </div>
             </form>
           ) : (
-            <div className='row'>
-              <div className='col-xs-12 col-md-8 offset-md-2'>
+            <div className="row">
+              <div className="col-xs-12 col-md-8 offset-md-2">
                 <p>
-                  <Link to='/login'>Sign in</Link> or{' '}
-                  <Link to='/register'>Sign up</Link> to add comments on this
+                  <Link to="/login">Sign in</Link> or{' '}
+                  <Link to="/register">Sign up</Link> to add comments on this
                   article.
                 </p>
               </div>
@@ -102,37 +106,37 @@ const Comments = ({ slug, isAuth }: any) => {
           {comments &&
             comments.length > 0 &&
             comments.map((comment: any) => (
-              <div className='card' key={comment?.id}>
-                <div className='card-block'>
-                  <p className='card-text'>{comment?.body}</p>
+              <div className="card" key={comment?.id}>
+                <div className="card-block">
+                  <p className="card-text">{comment?.body}</p>
                 </div>
-                <div className='card-footer'>
+                <div className="card-footer">
                   <Link
                     to={`/${comment?.author?.username}`}
-                    className='comment-author'
+                    className="comment-author"
                   >
                     <img
                       src={comment?.author?.image}
-                      className='comment-author-img'
+                      className="comment-author-img"
                     />
                   </Link>
                   &nbsp;
                   <Link
                     to={`/${comment?.author?.username}`}
-                    className='comment-author'
+                    className="comment-author"
                   >
                     {comment?.author?.username}
                   </Link>
-                  <span className='date-posted'>
-                    {dateConverter(comment?.updatedAt)}
+                  <span className="date-posted">
+                    {dateConverter(comment?.modifiedAt)}
                   </span>
                   {user?.username === comment?.author?.username && (
-                    <span className='mod-options'>
+                    <span className="mod-options">
                       {deletingCommentId === comment?.id ? (
                         'deleting...'
                       ) : (
                         <i
-                          className='ion-trash-a'
+                          className="ion-trash-a"
                           onClick={() => handleDeleteComment(comment?.id)}
                         ></i>
                       )}
@@ -144,7 +148,7 @@ const Comments = ({ slug, isAuth }: any) => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Comments
+export default Comments;

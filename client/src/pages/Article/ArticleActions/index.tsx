@@ -29,13 +29,13 @@ const ArticleActions = ({
   return (
     <div className='article-meta'>
       <Link to={`/${article?.author?.username}`}>
-        <img src={article?.author?.image} />
+        <img src={article?.author?.image} style={{     border: '16px solid'}} />
       </Link>
       <div className='info'>
         <Link to={`/${article?.author?.username}`} className='author'>
           {article?.author?.username}
         </Link>
-        <span className='date'>{dateConverter(article?.updatedAt)}</span>
+        <span className='date'>{dateConverter(article?.modifiedAt)}</span>
       </div>
       {isSameUser ? (
         <>
