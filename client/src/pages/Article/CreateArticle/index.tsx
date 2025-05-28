@@ -16,6 +16,7 @@ type Inputs = {
 }
 
 const CreateArticle = () => {
+  console.log(' - - -  - CreateArticle - - - ')
   const { slug } = useParams()
   const queryClient = useQueryClient()
   const navigate = useNavigate()

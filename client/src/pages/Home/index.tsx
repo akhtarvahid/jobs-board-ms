@@ -16,23 +16,25 @@ const Home = () => {
   const [active, setActive] = useState(defaultActive);
   const [currentPage, setCurrentPage] = useState(0);
   const { data: stories } = useGetStory('/story/all');
-  const { data: storiesFeed } = useGetStory('/story/feed');
-  console.log('DATA- - - -  -> ', storiesFeed);
-  const {
-    isArticlesLoading,
+  const { data: storiesFeed, loading: storyFeedLoading } = useGetStory('/story/feed');
+    const { data: newTags, loading: tagsLoading } = useGetStory('/tag');
 
-    isLocalArticlesLoading,
-    tags,
-    isTagsLoading,
-  } = useArticle({
-    limit: 10,
-    offset: offset,
-    tag: tag,
-    token: token,
-  });
+  console.log('DATA- - - -  -> ', storiesFeed, newTags);
+  // const {
+  //   // isArticlesLoading,
+
+  //   // isLocalArticlesLoading,
+  //   // tags,
+  //   // isTagsLoading,
+  // } = useArticle({
+  //   limit: 10,
+  //   offset: offset,
+  //   tag: tag,
+  //   token: token,
+  // });
   const articlesData = active === 'local' ? storiesFeed?.stories : stories?.stories;
 
-  const isLoading = isArticlesLoading || isLocalArticlesLoading;
+  const isLoading = storyFeedLoading;
   const pageCount = Math.ceil(
     (active === 'local'
       ? storiesFeed?.storiesCount || 0
@@ -123,11 +125,11 @@ const Home = () => {
             <div className="sidebar">
               <p>Popular Tags</p>
 
-              {isTagsLoading && <p>Loading tags...</p>}
+              {tagsLoading && <p>Loading tags...</p>}
 
               <div className="tag-list">
-                {tags &&
-                  tags.map((tagItem: any, i: number) => (
+                {newTags &&
+                  newTags.tags.map((tagItem: any, i: number) => (
                     <p
                       key={`${tagItem.id} - ${i}`}
                       className="tag-pill tag-default"

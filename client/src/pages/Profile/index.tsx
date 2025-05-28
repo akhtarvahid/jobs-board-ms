@@ -48,7 +48,7 @@ const Profile = () => {
     setOffset(e.selected * 10)
     setCurrentPage(e.selected)
   }
-  console.log('isFavorite: ', userData)
+  console.log('isFavorite called ?  ?: ', userData)
 
   return (
     <div className='profile-page'>

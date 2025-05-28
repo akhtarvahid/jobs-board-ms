@@ -4,7 +4,7 @@ import useProfile from '../../hooks/useProfile';
 import dateConverter from '../../utils/dateConverter';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useGetStory } from '../../hooks/useFetchArticles';
+import { useGetStory, useNewComment } from '../../hooks/useFetchArticles';
 
 type Inputs = {
   comment: {
@@ -12,7 +12,7 @@ type Inputs = {
   };
 };
 
-const Comments = ({ slug, isAuth }: any) => {
+const Comments = ({ slug, isAuth, user }: any) => {
   const [deletingCommentId, setDeletingCommentId] = useState<string | null>(
     null,
   );
@@ -29,40 +29,42 @@ const Comments = ({ slug, isAuth }: any) => {
     },
     mode: 'onChange',
   });
-  const { userData } = useProfile({});
-  const {
-    comments: commentsData,
-    createComment,
-    deleteComment,
-  } = useComment({ slug });
-  const comments = commentsData?.comments;
-  const user = userData?.user;
+  // const { userData } = useProfile({});
 
-  const { data: storyComments } = useGetStory(`/story/${slug}/comment`);
+
+  // const {
+  //   comments: commentsData,
+  //   // createComment,
+  //   // deleteComment,
+  // } = useComment({ slug });
+    const { data: storyComments } = useGetStory(`/story/${slug}/comment`);
   console.log('commetns', storyComments);
+
+  const comments = storyComments?.comments;
+
+
+
+  const { createComment: newCreateComment, loading } = useNewComment(`/story/${slug}/comment`);
 
   const onSubmit: SubmitHandler<Inputs> = async (data: any) => {
     try {
       if (slug) {
-        const res = await createComment.mutateAsync(data);
-        if (res) {
-          reset();
-        }
+       await newCreateComment(data)
       }
     } catch (error) {
       console.log('createErr: ', error);
     }
   };
 
-  const handleDeleteComment = async (id: any) => {
-    setDeletingCommentId(id);
-    if (!deleteComment.isLoading)
-      try {
-        await deleteComment.mutateAsync(id);
-      } catch (error) {
-        console.log('deleteErr: ', error);
-      }
-  };
+  // const handleDeleteComment = async (id: any) => {
+  //   setDeletingCommentId(id);
+  //   if (!deleteComment.isLoading)
+  //     try {
+  //       await deleteComment.mutateAsync(id);
+  //     } catch (error) {
+  //       console.log('deleteErr: ', error);
+  //     }
+  // };
   return (
     <>
       <div className="row">
@@ -85,7 +87,7 @@ const Comments = ({ slug, isAuth }: any) => {
                 <img src={user?.image} className="comment-author-img" />
                 <button
                   className="btn btn-sm btn-primary"
-                  disabled={createComment.isLoading}
+                  disabled={loading}
                 >
                   Post Comment
                 </button>
@@ -137,7 +139,7 @@ const Comments = ({ slug, isAuth }: any) => {
                       ) : (
                         <i
                           className="ion-trash-a"
-                          onClick={() => handleDeleteComment(comment?.id)}
+                          // onClick={() => handleDeleteComment(comment?.id)}
                         ></i>
                       )}
                     </span>

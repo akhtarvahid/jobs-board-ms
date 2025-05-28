@@ -11,13 +11,16 @@ import { useGetStory } from '../../hooks/useFetchArticles'
 const Article = () => {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const { follow, unfollow, userData } = useProfile({ slug: slug })
-  const {
-    // article: articleDataa,
-    favorite,
-    unfavorite,
-    deleteArticle
-  } = useArticle({ slug })
+        const { data: newUserData } = useGetStory(`/user/current-user`);
+      console.log('newUserData ', newUserData);
+  // const { follow, unfollow, userData } = useProfile({ slug: slug })
+  
+  // const {
+  //   // article: articleDataa,
+  //   favorite,
+  //   unfavorite,
+  //   deleteArticle
+  // } = useArticle({ slug })
       const { data: story } = useGetStory(`/story/${slug}`);
       console.log('Story - -- - - - ', story)
 
@@ -26,7 +29,7 @@ const Article = () => {
   const article = story?.story
   const isFollowing = article?.author?.following
   const isFavorite = article?.favorited
-  const isSameUser = article?.author?.username === userData?.user?.username
+  const isSameUser = article?.author?.username === newUserData?.user?.username
 
   return (
     <div className='article-page'>
@@ -38,14 +41,14 @@ const Article = () => {
             article={article}
             dateConverter={dateConverter}
             isFollowing={isFollowing}
-            unfollow={unfollow}
-            follow={follow}
+            unfollow={() => {}}
+            follow={() => {}}
             isFavorite={isFavorite}
-            unfavorite={unfavorite}
-            favorite={favorite}
+            unfavorite={() => {}}
+            favorite={() => {}}
             navigate={navigate}
             isAuth={isAuth}
-            deleteArticle={deleteArticle}
+            deleteArticle={() => {}}
           />
         </div>
       </div>
@@ -74,18 +77,18 @@ const Article = () => {
             article={article}
             dateConverter={dateConverter}
             isFollowing={isFollowing}
-            unfollow={unfollow}
-            follow={follow}
+            unfollow={() => {}}
+            follow={() => {}}
             isFavorite={isFavorite}
-            unfavorite={unfavorite}
-            favorite={favorite}
+            unfavorite={() => {}}
+            favorite={() => {}}
             navigate={navigate}
             isAuth={isAuth}
-            deleteArticle={deleteArticle}
+            deleteArticle={() => {}}
           />
         </div>
 
-        <Comments slug={slug} isAuth={isAuth} />
+        <Comments slug={slug} isAuth={isAuth} user={newUserData?.user} />
       </div>
     </div>
   )

@@ -80,3 +80,28 @@ export const useLikeStory = (url: string) => {
 
   return { data, loading, error, likeStory };
 };
+export const useNewComment = (url: string) => {
+  const [data, setData] = useState<DataType | null>(null);
+  const [loading, setLoading] = useState(false); // Start as false since no initial request
+  const [error, setError] = useState<string | null>(null);
+
+  const create = useCallback(async (postData: any) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const response = await api.post(url, postData);
+      console.log('COMMENT -> ', response);
+      setData(response.data);
+      return response.data; // Return the data for immediate use if needed
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.message || err.message;
+      setError(errorMessage);
+      throw errorMessage; // Re-throw to allow error handling in components
+    } finally {
+      setLoading(false);
+    }
+  }, [url]); // Dependency array ensures memoization
+
+  return { data, loading, error, create };
+};
