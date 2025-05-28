@@ -20,13 +20,13 @@ const CreateArticle = () => {
   const { slug } = useParams()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
-  const {
-    publishArticle,
-    article: articleData,
-    updateArticle
-  } = useArticle({ slug })
+  // const {
+  //   publishArticle,
+  //   article: articleData,
+  //   updateArticle
+  // } = useArticle({ slug })
   const [tags, setTags] = useState([])
-  const article = articleData?.article
+  // const article = articleData?.article
   const {
     register,
     handleSubmit,
@@ -34,47 +34,47 @@ const CreateArticle = () => {
     reset
   } = useForm<Inputs>()
 
-  useEffect(() => {
-    if (slug && !!article) {
-      reset({
-        article: {
-          title: article?.title || '',
-          description: article?.description || '',
-          body: article?.body || '',
-          tagList: ''
-        }
-      })
-    }
-  }, [slug, article])
+  // useEffect(() => {
+  //   if (slug && !!article) {
+  //     reset({
+  //       article: {
+  //         title: article?.title || '',
+  //         description: article?.description || '',
+  //         body: article?.body || '',
+  //         tagList: ''
+  //       }
+  //     })
+  //   }
+  // }, [slug, article])
 
-  useEffect(() => {
-    if (article?.tagList.length) setTags(article?.tagList)
-  }, [article?.tagList])
+  // useEffect(() => {
+  //   if (article?.tagList.length) setTags(article?.tagList)
+  // }, [article?.tagList])
   const handleClick = (tag: string) => {
     const updatedTags = tags.filter((t: string) => t !== tag)
     setTags(updatedTags)
   }
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    if (!!slug) {
-      if (!data.article.tagList) {
-        data.article.tagList = tags
-      } else {
-        data.article.tagList = data.article.tagList.split(/[\s,]+/).concat(tags)
-      }
-      const res = await updateArticle.mutateAsync(data)
-      console.log('res: ', res)
-      if (!!res) {
-        navigate(`/article/${slug}`)
-      }
-    } else {
-      data.article.tagList = data.article.tagList.split(/[\s,]+/)
-      const res = await publishArticle.mutateAsync(data)
-      if (res?.article?.slug) {
-        queryClient.invalidateQueries('get-articles')
-        navigate(`/article/${res?.article?.slug}`)
-      }
-    }
+    // if (!!slug) {
+    //   if (!data.article.tagList) {
+    //     data.article.tagList = tags
+    //   } else {
+    //     data.article.tagList = data.article.tagList.split(/[\s,]+/).concat(tags)
+    //   }
+    //   const res = await updateArticle.mutateAsync(data)
+    //   console.log('res: ', res)
+    //   if (!!res) {
+    //     navigate(`/article/${slug}`)
+    //   }
+    // } else {
+    //   data.article.tagList = data.article.tagList.split(/[\s,]+/)
+    //   const res = await publishArticle.mutateAsync(data)
+    //   if (res?.article?.slug) {
+    //     queryClient.invalidateQueries('get-articles')
+    //     navigate(`/article/${res?.article?.slug}`)
+    //   }
+    // }
   }
 
   return (
@@ -91,7 +91,7 @@ const CreateArticle = () => {
                     </li>
                   )
                 )}
-              {(publishArticle?.error as Record<string, any>) &&
+              {/* {(publishArticle?.error as Record<string, any>) &&
                 Object.keys(publishArticle?.error as Record<string, any>).map(
                   (errKey: string) =>
                     (
@@ -112,15 +112,15 @@ const CreateArticle = () => {
                     ).map((errMsg: string, i: number) => (
                       <li key={`${errKey}-${i}`}>{`${errKey} ${errMsg}`}</li>
                     ))
-                )}
+                )} */}
             </ul>
             <form onSubmit={handleSubmit(onSubmit)}>
               <fieldset>
                 {articleObjs.map((articleObj: any, c: number) => (
                   <FieldInput
-                    isLoading={
-                      publishArticle?.isLoading || updateArticle?.isLoading
-                    }
+                    // isLoading={
+                    //   publishArticle?.isLoading || updateArticle?.isLoading
+                    // }
                     {...articleObj}
                     register={register}
                     key={c}
@@ -132,13 +132,14 @@ const CreateArticle = () => {
                 <button
                   className='btn btn-lg pull-xs-right btn-primary'
                   type='submit'
-                  disabled={
-                    publishArticle?.isLoading || updateArticle?.isLoading
-                  }
+                  // disabled={
+                  //   publishArticle?.isLoading || updateArticle?.isLoading
+                  // }
                 >
-                  {publishArticle?.isLoading || updateArticle?.isLoading
+                  Publish
+                  {/* {publishArticle?.isLoading || updateArticle?.isLoading
                     ? 'Loading...'
-                    : 'Publish Article'}
+                    : 'Publish Article'} */}
                 </button>
               </fieldset>
             </form>

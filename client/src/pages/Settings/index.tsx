@@ -3,10 +3,10 @@ import { logout } from '../../store/user/userAuthSlice'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from 'react-query'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import useProfile from '../../hooks/useProfile'
 import { settingsObjs } from '../Authentication/Login/loginData'
 import FieldInput from '../../components/Inputs/FieldInput'
 import { useEffect } from 'react'
+import { useGetStory } from '../../hooks/useFetchArticles'
 
 type Inputs = {
   user: {
@@ -28,9 +28,11 @@ const Settings = () => {
     navigate('/')
   }
 
-  const { userData, updateUser } = useProfile({})
-  console.log('userData: ', userData?.user)
-  const user = userData?.user
+  // const { userData, updateUser } = useProfile({})
+    const { data: userNewData } = useGetStory(`user/current-user`);
+  
+  // console.log('SETTTINGSSS: ', userData, userNewData)
+  const user = userNewData?.user
   const {
     register,
     handleSubmit,
@@ -52,10 +54,10 @@ const Settings = () => {
   }, [user])
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    if (Object.keys(data?.user).length > 0) {
-      const res = await updateUser.mutateAsync(data)
-      if (!!res) navigate(`/${user?.username}`)
-    }
+    // if (Object.keys(data?.user).length > 0) {
+    //   const res = await updateUser.mutateAsync(data)
+    //   if (!!res) navigate(`/${user?.username}`)
+    // }
   }
 
   return (
@@ -71,15 +73,16 @@ const Settings = () => {
                   <FieldInput
                     {...settingObj}
                     register={register}
-                    isLoading={updateUser?.isLoading}
+                    // isLoading={updateUser?.isLoading}
                     key={c}
                   />
                 ))}
                 <button
                   className='btn btn-lg btn-primary pull-xs-right'
-                  disabled={updateUser.isLoading}
+                  // disabled={updateUser.isLoading}
                 >
-                  {updateUser?.isLoading ? 'Loading...' : 'Update Settings'}
+                  Update settings
+                  {/* {updateUser?.isLoading ? 'Loading...' : 'Update Settings'} */}
                 </button>
               </fieldset>
             </form>

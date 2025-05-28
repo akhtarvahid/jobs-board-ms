@@ -1,10 +1,12 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
-import useComment from '../../hooks/useComment';
-import useProfile from '../../hooks/useProfile';
 import dateConverter from '../../utils/dateConverter';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useGetStory, useNewComment } from '../../hooks/useFetchArticles';
+import {
+  useDeleteComment,
+  useGetStory,
+  useNewComment,
+} from '../../hooks/useFetchArticles';
 
 type Inputs = {
   comment: {
@@ -13,7 +15,7 @@ type Inputs = {
 };
 
 const Comments = ({ slug, isAuth, user }: any) => {
-  const [deletingCommentId, setDeletingCommentId] = useState<string | null>(
+  const [deletingCommentId, setDeletingCommentId] = useState<number | null>(
     null,
   );
   const {
@@ -29,43 +31,38 @@ const Comments = ({ slug, isAuth, user }: any) => {
     },
     mode: 'onChange',
   });
-  // const { userData } = useProfile({});
-
-
-  // const {
-  //   comments: commentsData,
-  //   // createComment,
-  //   // deleteComment,
-  // } = useComment({ slug });
-    const { data: storyComments } = useGetStory(`/story/${slug}/comment`);
+  const { data: storyComments } = useGetStory(`/story/${slug}/comment`);
   console.log('commetns', storyComments, isAuth);
 
   const comments = storyComments?.comments;
 
+  const {
+    data: newComment,
+    create: newCreateComment,
+    loading,
+  } = useNewComment(`/story/${slug}/comment`);
 
-
-  const { create: newCreateComment, loading } = useNewComment(`/story/${slug}/comment`);
+  const { deleteComment, loading: isDeleting } = useDeleteComment();
 
   const onSubmit: SubmitHandler<Inputs> = async (data: any) => {
-    console.log('created comment', slug)
+    console.log('created comment', slug);
     try {
       if (slug) {
-       await newCreateComment(data)
+        await newCreateComment(data);
       }
     } catch (error) {
       console.log('createErr: ', error);
     }
   };
 
-  // const handleDeleteComment = async (id: any) => {
-  //   setDeletingCommentId(id);
-  //   if (!deleteComment.isLoading)
-  //     try {
-  //       await deleteComment.mutateAsync(id);
-  //     } catch (error) {
-  //       console.log('deleteErr: ', error);
-  //     }
-  // };
+  console.log('Comment Added ', newComment);
+
+  const handleDeleteComment = async (id: any) => {
+    setDeletingCommentId(id);
+
+    await deleteComment(`/story/${slug}/comment/${id}`);
+    console.log('deleted comment id: ', id);
+  };
   return (
     <>
       <div className="row">
@@ -86,10 +83,7 @@ const Comments = ({ slug, isAuth, user }: any) => {
               </div>
               <div className="card-footer">
                 <img src={user?.image} className="comment-author-img" />
-                <button
-                  className="btn btn-sm btn-primary"
-                  disabled={loading}
-                >
+                <button className="btn btn-sm btn-primary" disabled={loading}>
                   Post Comment
                 </button>
               </div>
@@ -108,46 +102,49 @@ const Comments = ({ slug, isAuth, user }: any) => {
 
           {comments &&
             comments.length > 0 &&
-            comments.map((comment: any) => (
-              <div className="card" key={comment?.id}>
-                <div className="card-block">
-                  <p className="card-text">{comment?.body}</p>
-                </div>
-                <div className="card-footer">
-                  <Link
-                    to={`/${comment?.author?.username}`}
-                    className="comment-author"
-                  >
-                    <img
-                      src={comment?.author?.image}
-                      className="comment-author-img"
-                    />
-                  </Link>
-                  &nbsp;
-                  <Link
-                    to={`/${comment?.author?.username}`}
-                    className="comment-author"
-                  >
-                    {comment?.author?.username}
-                  </Link>
-                  <span className="date-posted">
-                    {dateConverter(comment?.modifiedAt)}
-                  </span>
-                  {user?.username === comment?.author?.username && (
-                    <span className="mod-options">
-                      {deletingCommentId === comment?.id ? (
-                        'deleting...'
-                      ) : (
-                        <i
-                          className="ion-trash-a"
-                          // onClick={() => handleDeleteComment(comment?.id)}
-                        ></i>
-                      )}
+            comments.map((comment: any) => {
+              console.log('Comment::: ', comment, user);
+              return (
+                <div className="card" key={comment?.id}>
+                  <div className="card-block">
+                    <p className="card-text">{comment?.body}</p>
+                  </div>
+                  <div className="card-footer">
+                    <Link
+                      to={`/${comment?.owner?.username}`}
+                      className="comment-author"
+                    >
+                      <img
+                        src={comment?.owner?.image}
+                        className="comment-author-img"
+                      />
+                    </Link>
+                    &nbsp;
+                    <Link
+                      to={`/${comment?.owner?.username}`}
+                      className="comment-author"
+                    >
+                      {comment?.owner?.username}
+                    </Link>
+                    <span className="date-posted">
+                      {dateConverter(comment?.updatedAt)}
                     </span>
-                  )}
+                    {user?.username === comment?.owner?.username && (
+                      <>
+                        <span
+                          className="mod-options"
+                          onClick={() => handleDeleteComment(comment.id)}
+                        >
+                          {isDeleting && deletingCommentId == comment.id
+                            ? 'Deleting..'
+                            : 'Delete'}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
         </div>
       </div>
     </>

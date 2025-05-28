@@ -1,7 +1,6 @@
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import ArticlePreview from '../../components/ArticlePreview';
-import useArticle from '../../hooks/useArticle';
 import { useState } from 'react';
 import ReactPaginate from 'react-paginate';
 import { Link } from 'react-router-dom';
@@ -16,23 +15,12 @@ const Home = () => {
   const [active, setActive] = useState(defaultActive);
   const [currentPage, setCurrentPage] = useState(0);
   const { data: stories } = useGetStory('/story/all');
-  const { data: storiesFeed, loading: storyFeedLoading } = useGetStory('/story/feed');
-    const { data: newTags, loading: tagsLoading } = useGetStory('/tag');
+  const { data: storiesFeed, loading: storyFeedLoading } =
+    useGetStory('/story/feed');
+  const { data: newTags, loading: tagsLoading } = useGetStory('/tag');
 
-  console.log('DATA- - - -  -> ', storiesFeed, newTags);
-  // const {
-  //   // isArticlesLoading,
-
-  //   // isLocalArticlesLoading,
-  //   // tags,
-  //   // isTagsLoading,
-  // } = useArticle({
-  //   limit: 10,
-  //   offset: offset,
-  //   tag: tag,
-  //   token: token,
-  // });
-  const articlesData = active === 'local' ? storiesFeed?.stories : stories?.stories;
+  const articlesData =
+    active === 'local' ? storiesFeed?.stories : stories?.stories;
 
   const isLoading = storyFeedLoading;
   const pageCount = Math.ceil(
