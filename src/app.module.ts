@@ -11,6 +11,7 @@ import { AuthMiddleware } from './user/middlewares/auth.middleware';
 import { JwtService } from '@nestjs/jwt';
 import { StoryModule } from './story/story.module';
 import { ProfileModule } from './profile/profile.module';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
   imports: [
@@ -19,10 +20,11 @@ import { ProfileModule } from './profile/profile.module';
       envFilePath: '.env',
     }),
     TypeOrmModule.forRoot(getTypeOrmConfig),
-    TagModule,
     UserModule,
-    StoryModule,
     ProfileModule,
+    StoryModule,
+    CommentModule,
+    TagModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtService],
@@ -36,6 +38,7 @@ export class AppModule {
         { path: '/user/register', method: RequestMethod.POST },
          { path: '/tag', method: RequestMethod.ALL },
         // { path: '/story/:slug', method: RequestMethod.GET },
+        { path: '/story/health', method: RequestMethod.GET },
       )
       .forRoutes({
         path: '*',
