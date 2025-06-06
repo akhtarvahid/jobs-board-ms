@@ -1,0 +1,250 @@
+openapi: 3.0.0
+paths:
+  /:
+    get:
+      operationId: AppController_getHello
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - App
+  /tag:
+    get:
+      operationId: TagController_findAllTags
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Tag
+  /user/register:
+    post:
+      operationId: UserController_createUser
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags: &ref_0
+        - User
+  /user/login:
+    post:
+      operationId: UserController_loginUser
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags: *ref_0
+  /user/current-user:
+    get:
+      operationId: UserController_currentUser
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_0
+    put:
+      operationId: UserController_updateUser
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_0
+  /story/health:
+    get:
+      operationId: StoryController_health
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: &ref_1
+        - Story
+  /story/all:
+    get:
+      operationId: StoryController_findAllStory
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
+  /story/feed:
+    get:
+      operationId: StoryController_userStories
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
+  /story/create:
+    post:
+      operationId: StoryController_createStory
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags: *ref_1
+  /story/{slug}:
+    put:
+      operationId: StoryController_updateStory
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
+    get:
+      operationId: CommentController_health
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: &ref_3
+        - Comment
+    delete:
+      operationId: StoryController_deleteAStory
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
+  /story/{slug}/like:
+    post:
+      operationId: StoryController_likeStory
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: ''
+      tags: *ref_1
+    delete:
+      operationId: StoryController_dislikeStory
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
+  /profile/health:
+    get:
+      operationId: ProfileController_health
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: &ref_2
+        - Profile
+  /profile/{username}:
+    get:
+      operationId: ProfileController_getProfile
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_2
+  /profile/{username}/follow:
+    post:
+      operationId: ProfileController_followProfile
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: ''
+      tags: *ref_2
+  /profile/{username}/unfollow:
+    delete:
+      operationId: ProfileController_unfollowProfile
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_2
+  /story/{slug}/comment:
+    get:
+      operationId: CommentController_getAllComments
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_3
+    post:
+      operationId: CommentController_createComment
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: ''
+      tags: *ref_3
+  /story/{slug}/comment/{id}:
+    put:
+      operationId: CommentController_updateComment
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags: *ref_3
+    delete:
+      operationId: CommentController_deleteComment
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags: *ref_3
+info:
+  title: TIP Medium Service
+  description: A Medium Service Provider
+  version: '1.0'
+  contact: {}
+tags: []
+servers: []
+components:
+  schemas: {}

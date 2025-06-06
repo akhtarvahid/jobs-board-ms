@@ -1,0 +1,673 @@
+openapi: 3.0.0
+paths:
+  /:
+    get:
+      operationId: AppController_getHello
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - App
+  /user/register:
+    post:
+      operationId: UserController_createUser
+      parameters: []
+      requestBody:
+        required: true
+        description: User registration data
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  $ref: '#/components/schemas/CreateUserDto'
+              required:
+                - user
+              example:
+                user:
+                  username: john_doe
+                  password: securePassword123!
+                  email: john@example.com
+      responses:
+        '201':
+          description: User successfully registered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/BuildUserInterface'
+        '400':
+          description: Validation error (e.g., invalid email)
+      summary: Register a new user
+      tags: &ref_0
+        - User
+  /user/login:
+    post:
+      operationId: UserController_loginUser
+      parameters: []
+      requestBody:
+        required: true
+        description: User login credentials
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      example: john@example.com
+                    password:
+                      type: string
+                      example: securePassword123!
+                  required:
+                    - email
+                    - password
+              example:
+                user:
+                  email: john@example.com
+                  password: securePassword123!
+      responses:
+        '200':
+          description: Successfully logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                      token:
+                        type: string
+        '401':
+          description: Invalid credentials
+      security:
+        - public: []
+      summary: Login existing user
+      tags: *ref_0
+  /user/current-user:
+    get:
+      description: Returns the profile of the authenticated user
+      operationId: UserController_currentUser
+      parameters: []
+      responses:
+        '200':
+          description: Successfully returned user profile
+          content:
+            application/json:
+              schema:
+                example:
+                  user:
+                    id: 1
+                    username: john_doe
+                    email: john@example.com
+                    token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        '401':
+          description: Unauthorized - Invalid or missing token
+      security:
+        - JWT-auth: []
+      summary: Get current user profile
+      tags: *ref_0
+    put:
+      description: Updates and returns the modified user profile
+      operationId: UserController_updateUser
+      parameters: []
+      requestBody:
+        required: true
+        description: User data to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDto'
+            examples:
+              example1:
+                value:
+                  username: john_doe
+                  bio: It's beginning to build the world!
+                  image: http://unsplash.com/hair-color.png
+      responses:
+        '200':
+          description: Successfully updated user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/UpdateUserDto'
+        '401':
+          description: Unauthorized - Invalid or missing token
+      security:
+        - JWT-auth: []
+      summary: Update current user profile
+      tags: *ref_0
+  /profile/health:
+    get:
+      operationId: ProfileController_health
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: &ref_1
+        - Profile
+  /profile/{username}:
+    get:
+      operationId: ProfileController_getProfile
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
+  /profile/{username}/follow:
+    post:
+      operationId: ProfileController_followProfile
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: ''
+      tags: *ref_1
+  /profile/{username}/unfollow:
+    delete:
+      operationId: ProfileController_unfollowProfile
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
+  /story/health:
+    get:
+      operationId: StoryController_health
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: &ref_2
+        - Story
+  /story/all:
+    get:
+      description: Returns all the story of the authenticated user
+      operationId: StoryController_findAllStory
+      parameters: []
+      responses:
+        '200':
+          description: Returns all stories with count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllStoryResponse'
+        '401':
+          description: 'Unauthorized: No token provided'
+      security:
+        - JWT-auth: []
+      summary: Get all the story
+      tags: *ref_2
+  /story/feed:
+    get:
+      description: Returns logged in user feed story
+      operationId: StoryController_userStories
+      parameters: []
+      responses:
+        '200':
+          description: Returns all logged in user feed story with count
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllStoryResponse'
+        '401':
+          description: 'Unauthorized: No token provided'
+      security:
+        - JWT-auth: []
+      summary: Get logged in user all the feed story
+      tags: *ref_2
+  /story/{storyId}:
+    get:
+      description: Return a story
+      operationId: StoryController_findAStory
+      parameters:
+        - name: storyId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns a single story
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoryResponse'
+        '401':
+          description: 'Unauthorized: No token provided'
+        '404':
+          description: Story not found!
+      security:
+        - JWT-auth: []
+      summary: Get a story
+      tags: *ref_2
+  /story/create:
+    post:
+      description: Token is required to create a story
+      operationId: StoryController_createStory
+      parameters: []
+      requestBody:
+        required: true
+        description: Story details to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStoryDto'
+            examples:
+              example1:
+                value:
+                  story:
+                    title: EcmaScript
+                    description: Learn modern js
+                    body: official doc or jsdev
+                    tagList:
+                      - JS
+                      - ES6
+      responses:
+        '400':
+          description: Bad request
+        '404':
+          description: Story not found!
+      security:
+        - JWT-auth: []
+      summary: Create a story
+      tags: *ref_2
+  /story/{slug}:
+    put:
+      description: Token is required to update a story
+      operationId: StoryController_updateStory
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: Provider mandatory details to update the story
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStoryDto'
+            examples:
+              example1:
+                value:
+                  story:
+                    title: EcmaScript
+                    description: Learn modern js
+                    body: official doc or jsdev
+      responses:
+        '400':
+          description: Bad request
+        '404':
+          description: Story not found!
+      security:
+        - JWT-auth: []
+      summary: Update a story
+      tags: *ref_2
+    delete:
+      operationId: StoryController_deleteAStory
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_2
+    get:
+      operationId: CommentController_health
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: &ref_3
+        - Comment
+  /story/{slug}/like:
+    post:
+      operationId: StoryController_likeStory
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: ''
+      tags: *ref_2
+    delete:
+      operationId: StoryController_dislikeStory
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_2
+  /story/{slug}/comment:
+    get:
+      operationId: CommentController_getAllComments
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_3
+    post:
+      operationId: CommentController_createComment
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: ''
+      tags: *ref_3
+  /story/{slug}/comment/{id}:
+    put:
+      operationId: CommentController_updateComment
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags: *ref_3
+    delete:
+      operationId: CommentController_deleteComment
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: ''
+      tags: *ref_3
+  /tag:
+    get:
+      operationId: TagController_findAllTags
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Tag
+info:
+  title: TIP Medium Service
+  description: A Medium Service Provider
+  version: '1.0'
+  contact: {}
+tags: []
+servers: []
+components:
+  securitySchemes:
+    JWT-auth:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+      name: Authorization
+      description: Enter JWT token
+      in: header
+  schemas:
+    UpdateUserDto:
+      type: object
+      properties:
+        username:
+          type: string
+          example: john_doe
+          description: New username
+        bio:
+          type: string
+          example: It's beginning to build the world!
+          description: User biography
+        image:
+          type: string
+          example: http://unsplash.com/hair-color.png
+          description: Profile image URL
+    OwnerResponse:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+        email:
+          type: string
+          example: user@example.com
+        username:
+          type: string
+          example: username
+        bio:
+          type: string
+          example: User bio
+        image:
+          type: string
+          example: ''
+      required:
+        - id
+        - email
+        - username
+    StoryResponse:
+      type: object
+      properties:
+        story:
+          description: The story object
+          allOf:
+            - $ref: '#/components/schemas/SingleStoryDto'
+      required:
+        - story
+    AllStoryResponse:
+      type: object
+      properties:
+        stories:
+          type: array
+          items:
+            $ref: '#/components/schemas/StoryResponse'
+        storiesCount:
+          type: number
+          example: 5
+      required:
+        - stories
+        - storiesCount
+    StoryOwnerDto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 3
+          description: User ID
+        email:
+          type: string
+          example: john@example.com
+          description: User email
+        username:
+          type: string
+          example: john_doe
+          description: Username
+        bio:
+          type: string
+          example: It's beginning to build the world!
+          description: User bio
+        image:
+          type: string
+          example: http://unsplash.com/hair-color.png
+          description: User profile image URL
+      required:
+        - id
+        - email
+        - username
+    SingleStoryDto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 8
+          description: Story ID
+        slug:
+          type: string
+          example: advance-js-3-cqa8qf
+          description: URL-friendly story slug
+        title:
+          type: string
+          example: Advance Js 3
+          description: Story title
+        description:
+          type: string
+          example: Did you ever wonder how?
+          description: Short description
+        body:
+          type: string
+          example: Believe it or not!
+          description: Main content body
+        createdAt:
+          format: date-time
+          type: string
+          example: '2025-05-20T11:55:27.690Z'
+          description: Creation timestamp
+        modifiedAt:
+          format: date-time
+          type: string
+          example: '2025-05-20T11:55:27.690Z'
+          description: Last modification timestamp
+        tagList:
+          example:
+            - JS
+            - ES6
+          description: List of tags
+          type: array
+          items:
+            type: string
+        favoritesCount:
+          type: number
+          example: 0
+          description: Number of times story was favorited
+        owner:
+          description: Story owner details
+          allOf:
+            - $ref: '#/components/schemas/StoryOwnerDto'
+      required:
+        - id
+        - slug
+        - title
+        - description
+        - body
+        - createdAt
+        - modifiedAt
+        - tagList
+        - favoritesCount
+        - owner
+    CreateStory:
+      type: object
+      properties:
+        title:
+          type: string
+          example: EcmaScript
+        description:
+          type: string
+          example: Learn modern js ecmaScript
+        body:
+          type: string
+          example: ecmaScript from official doc
+        tagList:
+          example:
+            - tag1
+            - tag2
+          type: array
+          items:
+            type: string
+        createdAt:
+          format: date-time
+          type: string
+          example: '2025-05-16T12:49:01.866Z'
+          default: '2025-05-16T12:49:01.866Z'
+        updatedAt:
+          format: date-time
+          type: string
+          example: '2025-05-16T12:49:01.866Z'
+          default: '2025-05-16T12:49:01.866Z'
+        favorited:
+          type: boolean
+          example: false
+          default: false
+        favoritesCount:
+          type: number
+          example: 0
+          default: 0
+      required:
+        - title
+        - description
+        - body
+        - tagList
+    CreateStoryDto:
+      type: object
+      properties:
+        story:
+          $ref: '#/components/schemas/CreateStory'
+      required:
+        - story
+    UpdateStory:
+      type: object
+      properties:
+        title:
+          type: string
+          example: title
+        description:
+          type: string
+          example: description
+        body:
+          type: string
+          example: body
+      required:
+        - title
+        - description
+        - body
+    UpdateStoryDto:
+      type: object
+      properties:
+        story:
+          $ref: '#/components/schemas/UpdateStory'
+      required:
+        - story
