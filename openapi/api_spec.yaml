@@ -18,6 +18,38 @@ paths:
           description: ''
       tags:
         - Tag
+  /user/register:
+    post:
+      operationId: UserController_createUser
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags: &ref_0
+        - User
+  /user/login:
+    post:
+      operationId: UserController_loginUser
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags: *ref_0
+  /user/current-user:
+    get:
+      operationId: UserController_currentUser
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_0
+    put:
+      operationId: UserController_updateUser
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_0
 info:
   title: TIP Medium Service
   description: A Medium Service Provider
