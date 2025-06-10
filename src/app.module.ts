@@ -10,6 +10,7 @@ import getTypeOrmConfig from './ormconfig';
 import { AuthMiddleware } from './user/middlewares/auth.middleware';
 import { JwtService } from '@nestjs/jwt';
 import { StoryModule } from './story/story.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { StoryModule } from './story/story.module';
     TagModule,
     UserModule,
     StoryModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtService],

@@ -59,9 +59,17 @@ paths:
           description: ''
       tags: &ref_1
         - Story
-  /story/feed:
+  /story/all:
     get:
       operationId: StoryController_findAllStory
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
+  /story/feed:
+    get:
+      operationId: StoryController_userStories
       parameters: []
       responses:
         '200':
@@ -137,6 +145,54 @@ paths:
         '200':
           description: ''
       tags: *ref_1
+  /profile/health:
+    get:
+      operationId: ProfileController_health
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: &ref_2
+        - Profile
+  /profile/{username}:
+    get:
+      operationId: ProfileController_getProfile
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_2
+  /profile/{username}/follow:
+    post:
+      operationId: ProfileController_followProfile
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: ''
+      tags: *ref_2
+  /profile/{username}/unfollow:
+    delete:
+      operationId: ProfileController_unfollowProfile
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_2
 info:
   title: TIP Medium Service
   description: A Medium Service Provider

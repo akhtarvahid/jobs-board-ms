@@ -7,6 +7,7 @@ import { DataSource, Repository } from 'typeorm';
 import { StoryResponseInterface } from './types/buildStoryResponse.type';
 import slugify from 'slugify';
 import { UpdateStoryDto } from './dto/updateStory.dto';
+import { FollowEntity } from '@app/profile/follow.entity';
 
 @Injectable()
 export class StoryService {
@@ -15,6 +16,8 @@ export class StoryService {
     private readonly storyRepository: Repository<StoryEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(FollowEntity)
+    private readonly profileRepository: Repository<FollowEntity>,
     private dataSource: DataSource,
   ) {}
 
@@ -83,7 +86,6 @@ export class StoryService {
         where: { id: userId },
         relations: ['favorites'],
       });
-      console.log(currentUser);
 
       if (!currentUser) {
         throw new HttpException('User not found!', HttpStatus.FORBIDDEN);
@@ -97,6 +99,45 @@ export class StoryService {
     });
 
     return { stories: storyWithFavorited, storiesCount };
+  }
+  async findUserStories(userId: number, query: any): Promise<any> {
+    const followingUsersStories = await this.profileRepository.find({
+      where: {
+        followerId: userId.toString(),
+      },
+    });
+
+    if (followingUsersStories.length === 0) {
+      return { stories: [], storiesCount: 0 };
+    }
+
+    const followingUsersStoryIds = followingUsersStories.map(
+      (fusId) => fusId.followingId,
+    );
+    const queryBuilder = this.dataSource
+      .getRepository(StoryEntity)
+      .createQueryBuilder('storyQuery')
+      .leftJoinAndSelect('storyQuery.owner', 'owner')
+      .andWhere('storyQuery.ownerId IN (:...ids)', {
+        ids: followingUsersStoryIds,
+      })
+      .orderBy('storyQuery.modifiedAt', 'DESC');
+
+    const feedStoriesCount = await queryBuilder.getCount();
+
+    if (query.limit) {
+      queryBuilder.limit(query.limit);
+    }
+    if (query.offset) {
+      queryBuilder.offset(query.offset);
+    }
+
+    const feedStories = await queryBuilder.getMany();
+
+    return {
+      stories: feedStories,
+      storiesCount: feedStoriesCount,
+    };
   }
   async createStory(
     createStoryDto: CreateStoryDto,
