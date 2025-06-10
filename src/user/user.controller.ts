@@ -16,13 +16,12 @@ import { User } from './decorators/user.decorator';
 import { UserEntity } from './user.entity';
 import { AuthGuard } from './guards/auth.guard';
 import { UpdateUserDto } from './dto/updateUser.dto';
-import { GlobalValidationPipe } from '@app/shared/pipes/global-validation.pipe';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
   @Post('register')
-  @UsePipes(new GlobalValidationPipe())
+  @UsePipes(new ValidationPipe())
   async createUser(
     @Body('user') createUserDto: CreateUserDto,
   ): Promise<BuildUserInterface> {
@@ -31,7 +30,7 @@ export class UserController {
   }
 
   @Post('login')
-  @UsePipes(new GlobalValidationPipe())
+  @UsePipes(new ValidationPipe())
   async loginUser(
     @Body('user') loginUserDto: LoginUserDto,
   ): Promise<BuildUserInterface> {
