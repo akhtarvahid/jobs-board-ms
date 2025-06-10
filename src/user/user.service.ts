@@ -32,6 +32,9 @@ export class UserService {
     return user;
   }
   async loginUser(loginUserDto: LoginUserDto): Promise<UserEntity> {
+    const errorResponse = {
+      errors: {},
+    };
     const user = await this.userRepository.findOne({
       where: {
         email: loginUserDto.email,
@@ -40,15 +43,15 @@ export class UserService {
     });
 
     if (!user) {
-      throw new HttpException(
-        'Credentials are not valid',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+      errorResponse.errors['email'] = 'email is invalid';
+      throw new HttpException(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     //compare password whether matches or not
     if (!user || !(await user.comparePassword(loginUserDto.password))) {
-      throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+      errorResponse.errors['password'] = 'password is invalid';
+
+      throw new HttpException(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
     //delete password from response for security
@@ -88,6 +91,9 @@ export class UserService {
   }
 
   async findUserByEmailOrUsername(text: string, type?: string) {
+    const errorResponse = {
+      errors: {},
+    };
     let userExist;
     if (type === 'username') {
       userExist = await this.userRepository.findOne({
@@ -95,6 +101,9 @@ export class UserService {
           username: text,
         },
       });
+      if (userExist) {
+        errorResponse.errors['username'] = 'username already been taken!';
+      }
     }
     if (type === 'email') {
       userExist = await this.userRepository.findOne({
@@ -102,12 +111,12 @@ export class UserService {
           email: text,
         },
       });
+      if (userExist) {
+        errorResponse.errors['email'] = 'email already been taken!';
+      }
     }
     if (userExist) {
-      throw new HttpException(
-        'Email or username already exist',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
+      throw new HttpException(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
     }
     return userExist;
   }
