@@ -48,7 +48,7 @@ export class StoryController {
 
   @Post('create')
   @UseGuards(AuthGuard)
-  @UsePipes(new GlobalValidationPipe())
+  @UsePipes(new ValidationPipe())
   async createStory(
     @User() user: UserEntity,
     @Body('story') createStoryDto: CreateStoryDto,
@@ -59,7 +59,7 @@ export class StoryController {
 
   @Put(':slug')
   @UseGuards(AuthGuard)
-  @UsePipes(new GlobalValidationPipe())
+  @UsePipes(new ValidationPipe())
   async updateStory(
     @Param('slug') slug: string,
     @User() user: UserEntity,
