@@ -18,7 +18,6 @@ const Profile = () => {
   const { data: profiles, loading: isProfileLoading } = useGetStory(
     `/profile/${username}`,
   );
-  console.log('profiles - -- - - - ', profiles);
   const profile = profiles?.profile;
 
   const isLoading = isStoryLoading;
@@ -31,7 +30,6 @@ const Profile = () => {
     setOffset(e.selected * 10);
     setCurrentPage(e.selected);
   };
-  console.log('isFavorite called ?  ?: ', userData);
 
   return (
     <div className="profile-page">

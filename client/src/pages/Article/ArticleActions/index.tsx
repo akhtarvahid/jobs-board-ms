@@ -14,12 +14,16 @@ const ArticleActions = ({
   isAuth,
   isSameUser,
   deleteArticle,
+  isDeleted,
 }: any) => {
   const handleDelete = async (slugData: any) => {
     if (slugData) {
       try {
         // TODO: Delete api call
-        navigate('/');
+        deleteArticle(slugData);
+        if (!isDeleted) {
+          navigate('/');
+        }
       } catch (error) {
         console.log('Error deleting article:', error);
       }
@@ -28,12 +32,12 @@ const ArticleActions = ({
 
   return (
     <div className="article-meta">
-      <Link to={`/${article?.author?.username}`}>
-        <img src={article?.author?.image} style={{ border: '16px solid' }} />
+      <Link to={`/${article?.owner?.username}`}>
+        <img src={article?.owner?.image} style={{ border: '16px solid' }} />
       </Link>
       <div className="info">
-        <Link to={`/${article?.author?.username}`} className="author">
-          {article?.author?.username}
+        <Link to={`/${article?.owner?.username}`} className="author">
+          {article?.owner?.username}
         </Link>
         <span className="date">{dateConverter(article?.modifiedAt)}</span>
       </div>
@@ -50,10 +54,9 @@ const ArticleActions = ({
           <button
             className="btn btn-outline-danger btn-sm"
             onClick={() => handleDelete(article?.slug)}
-            disabled={deleteArticle?.isLoading}
+            disabled={isDeleted}
           >
-            <i className="ion-trash-a"></i>
-            &nbsp; {deleteArticle?.isLoading ? 'Deleting...' : 'Delete Article'}
+            {isDeleted ? 'Deleting...' : 'Delete Article'}
           </button>
         </>
       ) : (

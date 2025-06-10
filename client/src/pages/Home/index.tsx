@@ -1,54 +1,48 @@
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import { RootState, useAppDispatch } from '../../store';
 import ArticlePreview from '../../components/ArticlePreview';
-import { useState } from 'react';
-import ReactPaginate from 'react-paginate';
-import { Link } from 'react-router-dom';
 import { useGetStory } from '../../hooks/useFetchArticles';
+import { fetchAllStory, fetchStoriesFeed } from '../../store/story/storySlice';
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
   const { token } = useSelector((state: RootState) => state.userAuth);
-  const isAuth = !!token;
-  const [offset, setOffset] = useState(0);
+  const isLoggedIn = !!token;
+  const dispatch = useAppDispatch();
+
+  const { feedStories, allStories } = useSelector(
+    (state: RootState) => state.storyState,
+  );
+
   const [tag, setTag] = useState();
-  const defaultActive = isAuth ? 'local' : 'global';
+  const defaultActive = isLoggedIn ? 'local' : 'global';
   const [active, setActive] = useState(defaultActive);
-  const [currentPage, setCurrentPage] = useState(0);
-  const { data: stories } = useGetStory('/story/all');
-  const { data: storiesFeed, loading: storyFeedLoading } =
-    useGetStory('/story/feed');
+
   const { data: newTags, loading: tagsLoading } = useGetStory('/tag');
 
-  const articlesData =
-    active === 'local' ? storiesFeed?.stories : stories?.stories;
+  useEffect(() => {
+    dispatch(fetchStoriesFeed());
+    dispatch(fetchAllStory());
+  }, []);
 
-  const isLoading = storyFeedLoading;
-  const pageCount = Math.ceil(
-    (active === 'local'
-      ? storiesFeed?.storiesCount || 0
-      : stories?.storiesCount || 0) / 10,
-  );
-  const handlePageClick = (e: any) => {
-    setOffset(e.selected * 10);
-    setCurrentPage(e.selected);
-  };
+  const storiesData =
+    active === 'local' ? feedStories?.stories : allStories?.stories;
+
+  const isLoading = feedStories.status === 'loading';
 
   const tabClick = (tag: any, tab: any) => {
-    setOffset(0);
-    setCurrentPage(0);
     setTag(tag);
     setActive(tab);
   };
 
-  console.log('AFSF', articlesData);
-
   return (
     <div className="home-page">
-      {!isAuth && (
+      {!isLoggedIn && (
         <div className="banner">
           <div className="container">
-            <h1 className="logo-font">conduit</h1>
-            <p>A place to share your knowledge.</p>
+            <h1 className="logo-font">WYS</h1>
+            <p>A place to share your story.</p>
           </div>
         </div>
       )}
@@ -58,7 +52,18 @@ const Home = () => {
           <div className="col-md-9">
             <div className="feed-toggle">
               <ul className="nav nav-pills outline-active">
-                {isAuth && (
+                <li className="nav-item">
+                  <Link
+                    className={`nav-link ${
+                      active === 'global' ? 'active' : ''
+                    }`}
+                    onClick={() => tabClick(undefined, 'global')}
+                    to="/"
+                  >
+                    Global Feed
+                  </Link>
+                </li>
+                {isLoggedIn && (
                   <li className="nav-item">
                     <Link
                       className={`nav-link ${
@@ -71,17 +76,6 @@ const Home = () => {
                     </Link>
                   </li>
                 )}
-                <li className="nav-item">
-                  <Link
-                    className={`nav-link ${
-                      active === 'global' ? 'active' : ''
-                    }`}
-                    onClick={() => tabClick(undefined, 'global')}
-                    to="/"
-                  >
-                    Global Feed
-                  </Link>
-                </li>
                 {tag && (
                   <li className="nav-item">
                     <a className={`nav-link ${active === tag ? 'active' : ''}`}>
@@ -94,17 +88,17 @@ const Home = () => {
               {isLoading && (
                 <p style={{ marginTop: '2rem' }}>Loading articles...</p>
               )}
-              {articlesData?.length === 0 && !isLoading && (
+              {storiesData?.length === 0 && !isLoading && (
                 <p style={{ marginTop: '2rem' }}>No articles here... yet.</p>
               )}
             </div>
 
-            {articlesData &&
-              articlesData.map((article: any) => (
+            {storiesData &&
+              storiesData.map((article: any, i: number) => (
                 <ArticlePreview
                   {...article}
-                  key={article?.slug}
-                  isAuth={isAuth}
+                  key={`${article?.slug}-${i}`}
+                  isAuth={isLoggedIn}
                 />
               ))}
           </div>
@@ -130,29 +124,6 @@ const Home = () => {
               </div>
             </div>
           </div>
-
-          {!isLoading && (
-            <ReactPaginate
-              breakLabel="..."
-              nextLabel="next >"
-              onPageChange={handlePageClick}
-              pageRangeDisplayed={5}
-              pageCount={pageCount}
-              previousLabel="< previous"
-              renderOnZeroPageCount={null}
-              breakClassName="page-item"
-              breakLinkClassName="page-link"
-              containerClassName="pagination justify-content-center"
-              pageClassName="page-item"
-              pageLinkClassName="page-link"
-              previousClassName="page-item"
-              previousLinkClassName="page-link"
-              nextClassName="page-item"
-              nextLinkClassName="page-link"
-              activeClassName="active"
-              forcePage={currentPage}
-            />
-          )}
         </div>
       </div>
     </div>

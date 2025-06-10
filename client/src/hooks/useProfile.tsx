@@ -1,116 +1,115 @@
-import { useSelector } from 'react-redux'
-import request from '../utils/request'
-import { useMutation, useQuery, useQueryClient } from 'react-query'
-import { RootState } from '../store'
+import { useSelector } from 'react-redux';
+import request from '../utils/request';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { RootState } from '../store';
 
 type ProfileTypes = {
-  slug?: string
-  username?: string
-}
+  slug?: string;
+  username?: string;
+};
 
 type SettingsData = {
   user: {
-    image?: string
-    username?: string
-    bio?: string
-    email?: string
-    password?: string
-  }
-}
+    image?: string;
+    username?: string;
+    bio?: string;
+    email?: string;
+    password?: string;
+  };
+};
 
 const followUser = (username: string) =>
   request
     .post(`/profiles/${username}/follow`)
     .then((res) => res.data)
     .catch((err) => {
-      console.error('followUser Err: ', err)
-      throw err
-    })
+      console.error('followUser Err: ', err);
+      throw err;
+    });
 
 const unFollowUser = (username: string) =>
   request
     .delete(`/profiles/${username}/follow`)
     .then((res) => res.data)
     .catch((err) => {
-      console.error('followUser Err: ', err)
-      throw err
-    })
+      console.error('followUser Err: ', err);
+      throw err;
+    });
 
 const updateUser = (data: SettingsData) =>
   request
     .put('/user', data)
     .then((res) => res.data)
     .catch((err) => {
-      console.error('updateUser Err: ', err)
-      throw err
-    })
+      console.error('updateUser Err: ', err);
+      throw err;
+    });
 
 const useProfile = ({ slug, username }: ProfileTypes) => {
-  const { token } = useSelector((state: RootState) => state.userAuth)
-  const queryClient = useQueryClient()
+  const { token } = useSelector((state: RootState) => state.userAuth);
+  const queryClient = useQueryClient();
   const getUser = () =>
     request
       .get('/user')
       .then((res) => res.data)
       .catch((err) => {
-        throw err
-      })
+        throw err;
+      });
 
   const getProfile = (username: any) => {
-    console.log('getProfile called...', username)
     return request
       .get(`/profiles/${username}`)
       .then((res) => res.data)
       .catch((err) => {
-        console.error('getProfileErr: ', err)
-        throw err
-      })
-  }
+        console.error('getProfileErr: ', err);
+        throw err;
+      });
+  };
 
   const {
     isLoading: isUserLoading,
     isError: isUserError,
     data: userData,
-    error: userError
+    error: userError,
   } = useQuery('get-user', getUser, {
-    enabled: !!token
-  })
+    enabled: !!token,
+  });
 
   const {
     isLoading: isProfileLoading,
     isError: isProfileError,
     data: profile,
-    error: profileError
+    error: profileError,
   } = useQuery(`get-profile-${username}`, () => getProfile(username), {
-    enabled: !!username
-  })
+    enabled: !!username,
+  });
 
   const handleSuccess = () => {
-    queryClient.invalidateQueries('get-articles-local')
+    queryClient.invalidateQueries('get-articles-local');
     if (slug !== undefined) {
-      queryClient.invalidateQueries(`get-article-${slug}`)
+      queryClient.invalidateQueries(`get-article-${slug}`);
     }
     if (username) {
-      queryClient.invalidateQueries(`get-profile-${username}`)
+      queryClient.invalidateQueries(`get-profile-${username}`);
     }
-  }
+  };
 
   const followMutation = useMutation(followUser, {
-    onSuccess: handleSuccess
-  })
+    onSuccess: handleSuccess,
+  });
 
   const unFollowMutation = useMutation(unFollowUser, {
-    onSuccess: handleSuccess
-  })
+    onSuccess: handleSuccess,
+  });
 
   const updateUserMutation = useMutation(updateUser, {
     onSuccess: () => {
-      queryClient.invalidateQueries('get-user')
+      queryClient.invalidateQueries('get-user');
     },
     onError: (err: any) => {
-      throw err
-    }
-  })
+      throw err;
+    },
+  });
 
   return {
     isUserLoading,
@@ -123,8 +122,8 @@ const useProfile = ({ slug, username }: ProfileTypes) => {
     profile,
     profileError,
     isProfileLoading,
-    isProfileError
-  }
-}
+    isProfileError,
+  };
+};
 
-export default useProfile
+export default useProfile;

@@ -1,12 +1,15 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import dateConverter from '../../utils/dateConverter';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  useDeleteComment,
-  useGetStory,
-  useNewComment,
-} from '../../hooks/useFetchArticles';
+  addComment,
+  deleteComment,
+  getComments,
+  updateComment,
+} from '../../store/story/storySlice';
+import { RootState, useAppDispatch } from '../../store';
+import { useSelector } from 'react-redux';
 
 type Inputs = {
   comment: {
@@ -15,6 +18,9 @@ type Inputs = {
 };
 
 const Comments = ({ slug, isAuth, user }: any) => {
+  const dispatch = useAppDispatch();
+  const { allStories } = useSelector((state: RootState) => state.storyState);
+  const [editingCommentId, setEditingCommentId] = useState(null);
   const [deletingCommentId, setDeletingCommentId] = useState<number | null>(
     null,
   );
@@ -31,37 +37,45 @@ const Comments = ({ slug, isAuth, user }: any) => {
     },
     mode: 'onChange',
   });
-  const { data: storyComments } = useGetStory(`/story/${slug}/comment`);
-  console.log('commetns', storyComments, isAuth);
 
-  const comments = storyComments?.comments;
+  const { storyComments } = allStories;
+  const comments = [...storyComments];
 
-  const {
-    data: newComment,
-    create: newCreateComment,
-    loading,
-  } = useNewComment(`/story/${slug}/comment`);
+  useEffect(() => {
+    dispatch(getComments({ slug: slug }));
+  }, [slug]);
 
-  const { deleteComment, loading: isDeleting } = useDeleteComment();
+  // const { deleteComment, loading: isDeleting } = useDeleteComment();
 
   const onSubmit: SubmitHandler<Inputs> = async (data: any) => {
-    console.log('created comment', slug);
     try {
       if (slug) {
-        await newCreateComment(data);
+        if (editingCommentId) {
+          dispatch(
+            updateComment({ slug: slug, id: editingCommentId, comment: data }),
+          );
+        } else {
+          dispatch(addComment({ slug: slug, comment: data }));
+        }
+        reset({
+          comment: {
+            body: '',
+          },
+        });
       }
     } catch (error) {
       console.log('createErr: ', error);
     }
   };
 
-  console.log('Comment Added ', newComment);
-
   const handleDeleteComment = async (id: any) => {
     setDeletingCommentId(id);
-
-    await deleteComment(`/story/${slug}/comment/${id}`);
-    console.log('deleted comment id: ', id);
+    dispatch(
+      deleteComment({
+        slug: slug,
+        id: id,
+      }),
+    );
   };
   return (
     <>
@@ -83,8 +97,16 @@ const Comments = ({ slug, isAuth, user }: any) => {
               </div>
               <div className="card-footer">
                 <img src={user?.image} className="comment-author-img" />
-                <button className="btn btn-sm btn-primary" disabled={loading}>
-                  Post Comment
+                <button className="btn btn-sm btn-primary">
+                  {allStories.status === 'loading'
+                    ? 'Comment adding...'
+                    : 'Post Comment'}
+                </button>
+                <button
+                  className="btn btn-sm btn-danger"
+                  onClick={() => reset()}
+                >
+                  Reset
                 </button>
               </div>
             </form>
@@ -103,7 +125,6 @@ const Comments = ({ slug, isAuth, user }: any) => {
           {comments &&
             comments.length > 0 &&
             comments.map((comment: any) => {
-              console.log('Comment::: ', comment, user);
               return (
                 <div className="card" key={comment?.id}>
                   <div className="card-block">
@@ -132,10 +153,24 @@ const Comments = ({ slug, isAuth, user }: any) => {
                     {user?.username === comment?.owner?.username && (
                       <>
                         <span
+                          onClick={() => {
+                            setEditingCommentId(comment.id);
+
+                            reset({
+                              comment: {
+                                body: comment.body,
+                              },
+                            });
+                          }}
+                          className="mod-options"
+                        >
+                          <i className="ion-edit"></i>
+                        </span>
+                        <span
                           className="mod-options"
                           onClick={() => handleDeleteComment(comment.id)}
                         >
-                          {isDeleting && deletingCommentId == comment.id
+                          {deletingCommentId == comment.id
                             ? 'Deleting..'
                             : 'Delete'}
                         </span>

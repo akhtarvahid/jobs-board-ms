@@ -7,16 +7,14 @@ const FieldInput = ({
   isLoading,
   tags = [],
   slug = '',
-  handleClick
+  handleClick,
 }: any) => {
-  console.log('tags: ', tags)
-
   return (
-    <fieldset className='form-group'>
+    <fieldset className="form-group">
       {name === 'user.bio' || name === 'article.body' ? (
         <textarea
           disabled={isLoading}
-          className='form-control form-control-lg'
+          className="form-control form-control-lg"
           rows={8}
           placeholder={placeholder}
           {...register(name, { ...validation })}
@@ -24,18 +22,21 @@ const FieldInput = ({
       ) : (
         <input
           disabled={isLoading}
-          className='form-control form-control-lg'
+          className="form-control form-control-lg"
           type={type}
           placeholder={placeholder}
           {...register(name, tags.length === 0 && validation)}
         />
       )}
       {name === 'article.tagList' && slug && (
-        <div className='tag-list'>
+        <div className="tag-list">
           {tags.map((tag: string, i: number) => (
-            <span  key={`${tag} - ${i}`} className='tag-default tag-pill ng-binding ng-scope'>
+            <span
+              key={`${tag} - ${i}`}
+              className="tag-default tag-pill ng-binding ng-scope"
+            >
               <i
-                className='ion-close-round'
+                className="ion-close-round"
                 onClick={() => handleClick(tag)}
               ></i>{' '}
               {tag}
@@ -44,7 +45,7 @@ const FieldInput = ({
         </div>
       )}
     </fieldset>
-  )
-}
+  );
+};
 
-export default FieldInput
+export default FieldInput;

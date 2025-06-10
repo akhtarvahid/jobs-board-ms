@@ -1,35 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import api from './api';
-import { Story } from '../types/story.type';
-
-// Example POST request
-const createPost = async (postData: any) => {
-  try {
-    const response = await api.post('/posts', postData);
-    return response.data;
-  } catch (error: any) {
-    throw error.response?.data?.message || error.message;
-  }
-};
-
-// Example PUT request
-const updateUser = async (userId: any, userData: any) => {
-  try {
-    const response = await api.put(`/users/${userId}`, userData);
-    return response.data;
-  } catch (error: any) {
-    throw error.response?.data?.message || error.message;
-  }
-};
-
-// Example DELETE request
-const deleteItem = async (itemId: any) => {
-  try {
-    await api.delete(`/items/${itemId}`);
-  } catch (error: any) {
-    throw error.response?.data?.message || error.message;
-  }
-};
 
 export const useGetStory = (url: string) => {
   const [data, setData] = useState<any | null>(null);
@@ -63,7 +33,7 @@ export const useLikeStory = (url: string) => {
   const likeStory = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await api.post(url);
       setData(response.data);
@@ -84,23 +54,25 @@ export const useNewComment = (url: string) => {
   const [loading, setLoading] = useState(false); // Start as false since no initial request
   const [error, setError] = useState<string | null>(null);
 
-  const create = useCallback(async (postData: any) => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const response = await api.post(url, postData);
-      console.log('COMMENT -> ', response);
-      setData(response.data);
-      return response.data; // Return the data for immediate use if needed
-    } catch (err: any) {
-      const errorMessage = err.response?.data?.message || err.message;
-      setError(errorMessage);
-      throw errorMessage; // Re-throw to allow error handling in components
-    } finally {
-      setLoading(false);
-    }
-  }, [url]); // Dependency array ensures memoization
+  const create = useCallback(
+    async (postData: any) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await api.post(url, postData);
+        setData(response.data);
+        return response.data; // Return the data for immediate use if needed
+      } catch (err: any) {
+        const errorMessage = err.response?.data?.message || err.message;
+        setError(errorMessage);
+        throw errorMessage; // Re-throw to allow error handling in components
+      } finally {
+        setLoading(false);
+      }
+    },
+    [url],
+  ); // Dependency array ensures memoization
 
   return { data, loading, error, create };
 };
@@ -113,10 +85,9 @@ export const useDeleteComment = () => {
   const deleteComment = useCallback(async (url: string) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await api.delete(url);
-      console.log('Deleted COMMENT -> ', response);
       setData(response.data);
       return response.data; // Return the data for immediate use if needed
     } catch (err: any) {

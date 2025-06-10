@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
 import dateConverter from '../../utils/dateConverter';
 import { useLikeStory } from '../../hooks/useFetchArticles';
+import { avatar } from '../../utils/constant';
 
 const ArticlePreview = (props: any) => {
   const {
-    author,
+    owner,
     modifiedAt,
     description,
     favoritesCount,
@@ -15,18 +16,15 @@ const ArticlePreview = (props: any) => {
 
   const { likeStory } = useLikeStory(`/story/${slug}/like`);
   const likeStoryHandler = () => {
-    console.log('liked');
     likeStory();
   };
   return (
     <div className="article-preview">
       <div className="article-meta">
-        <Link to={`/${author?.username}`}>
-          <img src={author?.image} />
+        <Link to={`/${owner?.username}`}>
+          <img src={owner?.image || avatar} />
           <div className="info">
-            <a href="" className="author">
-              {author?.username}
-            </a>
+            <span className="author">{owner?.username}</span>
             <span className="date">{dateConverter(modifiedAt)}</span>
           </div>
         </Link>
@@ -43,7 +41,7 @@ const ArticlePreview = (props: any) => {
         <span>Read more...</span>
         <ul className="tag-list">
           {tagList &&
-            tagList.map((tag: string, i: number) => (
+            tagList?.map((tag: string, i: number) => (
               <li
                 key={`${tag} - ${i}`}
                 className="tag-default tag-pill tag-outline ng-binding ng-scope"

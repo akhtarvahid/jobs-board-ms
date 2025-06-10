@@ -1,8 +1,10 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import FieldInput from '../../../components/Inputs/FieldInput';
 import { articleObjs } from '../../Authentication/Login/loginData';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useState } from 'react';
+import { addStory } from '../../../store/story/storySlice';
+import { useAppDispatch } from '../../../store';
 
 type Inputs = {
   article: {
@@ -14,7 +16,9 @@ type Inputs = {
 };
 
 const CreateArticle = () => {
-  console.log(' - - -  - CreateArticle - - - ');
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
   const { slug } = useParams();
   const [tags, setTags] = useState([]);
   const {
@@ -29,7 +33,16 @@ const CreateArticle = () => {
   };
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    console.log('submitted form', data);
+    try {
+      dispatch(
+        addStory({
+          story: data.article,
+        }),
+      );
+      navigate(`/`);
+    } catch (error) {
+      console.log('failed add story');
+    }
   };
 
   return (

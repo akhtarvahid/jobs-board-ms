@@ -3,14 +3,11 @@ import { useSelector } from 'react-redux';
 import { NavLink } from 'react-router-dom';
 import { RootState } from '../../store';
 import { privateLinks, publicLinks } from './navLinks';
-import useProfile from '../../hooks/useProfile';
 import { useGetStory } from '../../hooks/useFetchArticles';
 
 const Header: React.FC = () => {
   const { token } = useSelector((state: RootState) => state.userAuth);
-  // const { userData } = useProfile({})
   const { data: newUserData } = useGetStory(`/user/current-user`);
-  console.log('-  --  - -- - HEADER- --- - - - - - ', newUserData);
   const userName = newUserData?.user?.username;
   if (userName) {
     privateLinks.splice(3, 1, {
@@ -24,7 +21,7 @@ const Header: React.FC = () => {
     <nav className="navbar navbar-light">
       <div className="container">
         <NavLink className="navbar-brand" to="/">
-          conduit
+          WYS <span style={{ fontSize: '.9rem' }}>write your story</span>
         </NavLink>
         <ul className="nav navbar-nav pull-xs-right">
           {navLinks.map(({ to, name, icon }) => (
