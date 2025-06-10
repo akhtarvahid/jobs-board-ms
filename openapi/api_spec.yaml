@@ -50,6 +50,93 @@ paths:
         '200':
           description: ''
       tags: *ref_0
+  /story/health:
+    get:
+      operationId: StoryController_health
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: &ref_1
+        - Story
+  /story/feed:
+    get:
+      operationId: StoryController_findAllStory
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
+  /story/create:
+    post:
+      operationId: StoryController_createStory
+      parameters: []
+      responses:
+        '201':
+          description: ''
+      tags: *ref_1
+  /story/{slug}:
+    put:
+      operationId: StoryController_updateStory
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
+    get:
+      operationId: StoryController_findAStory
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
+    delete:
+      operationId: StoryController_deleteAStory
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
+  /story/{slug}/like:
+    post:
+      operationId: StoryController_likeStory
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: ''
+      tags: *ref_1
+    delete:
+      operationId: StoryController_dislikeStory
+      parameters:
+        - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
 info:
   title: TIP Medium Service
   description: A Medium Service Provider
