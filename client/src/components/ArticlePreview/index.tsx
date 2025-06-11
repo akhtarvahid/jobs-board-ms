@@ -7,7 +7,7 @@ const ArticlePreview = (props: any) => {
   const {
     owner,
     modifiedAt,
-    description,
+    body,
     favoritesCount,
     slug,
     tagList,
@@ -37,7 +37,7 @@ const ArticlePreview = (props: any) => {
       </div>
       <Link to={`/article/${props.id}`} className="preview-link">
         <h1>{title}</h1>
-        <p>{description}</p>
+        <p>{body}</p>
         <span>Read more...</span>
         <ul className="tag-list">
           {tagList &&

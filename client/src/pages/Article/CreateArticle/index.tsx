@@ -1,9 +1,9 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import FieldInput from '../../../components/Inputs/FieldInput';
 import { articleObjs } from '../../Authentication/Login/loginData';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useState } from 'react';
-import { addStory } from '../../../store/story/storySlice';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { addStory, updateStory } from '../../../store/story/storySlice';
 import { useAppDispatch } from '../../../store';
 
 type Inputs = {
@@ -21,11 +21,19 @@ const CreateArticle = () => {
 
   const { slug } = useParams();
   const [tags, setTags] = useState([]);
+  const { state } = useLocation();
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<Inputs>();
+
+  useEffect(() => {
+    reset({
+      article: state.article,
+    });
+  }, [state.article]);
 
   const handleClick = (tag: string) => {
     const updatedTags = tags.filter((t: string) => t !== tag);
@@ -34,11 +42,20 @@ const CreateArticle = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      dispatch(
-        addStory({
-          story: data.article,
-        }),
-      );
+      if (state.article) {
+        dispatch(
+          updateStory({
+            slug: state.article.slug,
+            story: data.article,
+          }),
+        );
+      } else {
+        dispatch(
+          addStory({
+            story: data.article,
+          }),
+        );
+      }
       navigate(`/`);
     } catch (error) {
       console.log('failed add story');

@@ -45,7 +45,9 @@ const ArticleActions = ({
         <>
           <button
             className="btn btn-sm btn-outline-secondary"
-            onClick={() => navigate(`/editor/${article?.slug}`)}
+            onClick={() =>
+              navigate(`/editor/${article?.slug}`, { state: { article } })
+            }
           >
             <i className="ion-edit"></i>
             &nbsp; Edit Article

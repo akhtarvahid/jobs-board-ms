@@ -45,8 +45,6 @@ const Comments = ({ slug, isAuth, user }: any) => {
     dispatch(getComments({ slug: slug }));
   }, [slug]);
 
-  // const { deleteComment, loading: isDeleting } = useDeleteComment();
-
   const onSubmit: SubmitHandler<Inputs> = async (data: any) => {
     try {
       if (slug) {
@@ -57,6 +55,7 @@ const Comments = ({ slug, isAuth, user }: any) => {
         } else {
           dispatch(addComment({ slug: slug, comment: data }));
         }
+        setEditingCommentId(null);
         reset({
           comment: {
             body: '',
@@ -77,6 +76,16 @@ const Comments = ({ slug, isAuth, user }: any) => {
       }),
     );
   };
+  const handleEditComment = async (comment: any) => {
+    setEditingCommentId(comment.id);
+
+    reset({
+      comment: {
+        body: comment.body,
+      },
+    });
+  };
+
   return (
     <>
       <div className="row">
@@ -153,15 +162,7 @@ const Comments = ({ slug, isAuth, user }: any) => {
                     {user?.username === comment?.owner?.username && (
                       <>
                         <span
-                          onClick={() => {
-                            setEditingCommentId(comment.id);
-
-                            reset({
-                              comment: {
-                                body: comment.body,
-                              },
-                            });
-                          }}
+                          onClick={() => handleEditComment(comment)}
                           className="mod-options"
                         >
                           <i className="ion-edit"></i>

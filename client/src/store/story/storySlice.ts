@@ -87,11 +87,12 @@ export const addStory = createAsyncThunk(
   },
 );
 
-// update story by id
+// update story by slug
 export const updateStory = createAsyncThunk(
   'story/update',
-  async (story: Story) => {
-    const response = await api.post(`${API_URL}/${story.id}`, story);
+  async (payload: any) => {
+    const { slug, story } = payload;
+    const response = await api.put(`${API_URL}/${slug}`, { story });
     return response.data;
   },
 );
@@ -100,8 +101,9 @@ export const updateStory = createAsyncThunk(
 export const deleteStory = createAsyncThunk(
   'api/deleteStory',
   async (slug: string) => {
-    await api.delete(`${API_URL}/${slug}`);
-    return `${slug} deleted successfully!`;
+    const response = await api.delete(`${API_URL}/${slug}`);
+    response.data.slug = slug;
+    return response.data;
   },
 );
 
@@ -206,13 +208,13 @@ const storySlice = createSlice({
       .addCase(updateStory.pending, (state) => {
         state.allStories.status = 'loading';
       })
-      .addCase(updateStory.fulfilled, (state, action: PayloadAction<Story>) => {
+      .addCase(updateStory.fulfilled, (state, action: PayloadAction<any>) => {
         state.allStories.status = 'succeeded';
         const index = state.allStories.stories.findIndex(
-          (item) => item.id === action.payload.id,
+          (item) => item.id === action.payload.story.id,
         );
         if (index !== -1) {
-          state.allStories.stories[index] = action.payload;
+          state.allStories.stories[index] = action.payload.story;
         }
       })
 
@@ -220,15 +222,12 @@ const storySlice = createSlice({
       .addCase(deleteStory.pending, (state) => {
         state.allStories.status = 'loading';
       })
-      .addCase(
-        deleteStory.fulfilled,
-        (state, action: PayloadAction<string>) => {
-          state.allStories.status = 'succeeded';
-          state.allStories.stories = state.allStories.stories.filter(
-            (item) => item.slug !== action.payload,
-          );
-        },
-      )
+      .addCase(deleteStory.fulfilled, (state, action: PayloadAction<any>) => {
+        state.allStories.status = 'succeeded';
+        state.allStories.stories = state.allStories.stories.filter(
+          (item) => item.slug !== action.payload.slug,
+        );
+      })
 
       // Add comment
       .addCase(addComment.pending, (state) => {
