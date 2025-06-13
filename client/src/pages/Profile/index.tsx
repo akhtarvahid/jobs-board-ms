@@ -1,33 +1,64 @@
 import { Link, NavLink, useLocation, useParams } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../store';
+import { RootState, useAppDispatch } from '../../store';
 import ReactPaginate from 'react-paginate';
 import ArticlePreview from '../../components/ArticlePreview';
-import { useGetStory } from '../../hooks/useFetchArticles';
+import {
+  getProfile,
+  userCreatedStories,
+  userFavoritedStories,
+} from '../../store/profile/profileSlice';
+import { getUser } from '../../store/user/userAuthSlice';
 
 const Profile = () => {
+  const dispatch = useAppDispatch();
+  const {
+    profileData: { profile, isLoading: isProfileLoading },
+    favoritedData: {
+      stories: favoritedStories,
+      isLoading: isFavoritedStoriesLoading,
+      storiesCount: favoritedStoriesCount,
+    },
+    UserData: { stories, isLoading: isUserStoriesLoading, storiesCount },
+  } = useSelector((state: RootState) => state.profileState);
   const { username } = useParams();
   const { pathname } = useLocation();
-  const { token } = useSelector((state: RootState) => state.userAuth);
-  const isAuth = !!token;
-  const [offset, setOffset] = useState(0);
-  const [currentPage, setCurrentPage] = useState(0);
-  const { data: story, loading: isStoryLoading } = useGetStory(`/story/feed`);
-  const { data: userData } = useGetStory(`user/current-user`);
-  const { data: profiles, loading: isProfileLoading } = useGetStory(
-    `/profile/${username}`,
-  );
-  const profile = profiles?.profile;
+  const tabPath = pathname?.split('/')?.[2];
 
-  const isLoading = isStoryLoading;
-  const pageCount = Math.ceil((story?.storiesCount || 0) / 10);
-  const articlesData = story?.stories;
+  const { token, currentUser } = useSelector(
+    (state: RootState) => state.userAuth,
+  );
+  const isAuth = !!token;
+  const [currentPage, setCurrentPage] = useState(0);
+  useEffect(() => {
+    dispatch(getProfile({ username: username }));
+    dispatch(getUser());
+    if (tabPath === 'favorites') {
+      dispatch(
+        userFavoritedStories({
+          username: username,
+        }),
+      );
+    } else {
+      dispatch(
+        userCreatedStories({
+          username: username,
+        }),
+      );
+    }
+  }, [username, tabPath]);
+
+  const isLoading =
+    isUserStoriesLoading || isProfileLoading || isFavoritedStoriesLoading;
+  const count =
+    (tabPath === 'favorites' ? favoritedStoriesCount : storiesCount) || 0;
+  const pageCount = Math.ceil((count || 0) / 10);
+  const articlesData = tabPath === 'favorites' ? favoritedStories : stories;
   const isFollowing = profile?.following;
-  const isSameUser = userData?.user?.username === profile?.username;
+  const isSameUser = currentUser?.user?.username === profile?.username;
 
   const handlePageClick = (e: any) => {
-    setOffset(e.selected * 10);
     setCurrentPage(e.selected);
   };
 
@@ -37,7 +68,11 @@ const Profile = () => {
         <div className="container">
           <div className="row">
             <div className="col-xs-12 col-md-10 offset-md-1">
-              <img src={profile?.image} className="user-img" />
+              <img
+                src={profile?.image}
+                className="user-img"
+                style={{ background: '#5CB85C' }}
+              />
               <h4>{profile?.username}</h4>
               <p>{profile?.bio}</p>
               {isSameUser ? (
@@ -83,7 +118,7 @@ const Profile = () => {
                 </li>
                 <li className="nav-item">
                   <NavLink className="nav-link" to={`/${username}/favorites`}>
-                    Favorited Articles(TODO: API mapping is not correct)
+                    Favorited Articles
                   </NavLink>
                 </li>
               </ul>
@@ -106,7 +141,7 @@ const Profile = () => {
                 />
               ))}
 
-            {!isLoading && !isProfileLoading && (
+            {!isLoading && (
               <ReactPaginate
                 breakLabel="..."
                 nextLabel="next >"
