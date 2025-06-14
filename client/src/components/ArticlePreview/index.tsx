@@ -1,15 +1,30 @@
 import { Link } from 'react-router-dom';
 import dateConverter from '../../utils/dateConverter';
-import { useLikeStory } from '../../hooks/useFetchArticles';
 import { avatar } from '../../utils/constant';
+import { useAppDispatch } from '../../store';
+import {
+  handleDislikeStory,
+  handleLikeStory,
+} from '../../store/story/storySlice';
 
 const ArticlePreview = (props: any) => {
-  const { owner, modifiedAt, body, favoritesCount, slug, tagList, title } =
-    props;
+  const dispatch = useAppDispatch();
+  const {
+    owner,
+    modifiedAt,
+    body,
+    favoritesCount,
+    slug,
+    tagList,
+    title,
+    favorited,
+  } = props;
 
-  const { likeStory } = useLikeStory(`/story/${slug}/like`);
   const likeStoryHandler = () => {
-    likeStory();
+    dispatch(handleLikeStory({ slug: slug }));
+  };
+  const dislikeStoryHandler = () => {
+    dispatch(handleDislikeStory({ slug: slug }));
   };
 
   return (
@@ -22,12 +37,26 @@ const ArticlePreview = (props: any) => {
             <span className="date">{dateConverter(modifiedAt)}</span>
           </div>
         </Link>
+        <span className="btn-outline-primary btn-sm pull-xs-right">
+          <i className="ion-heart"></i> {favoritesCount}
+        </span>
         <button
           className="btn btn-outline-primary btn-sm pull-xs-right"
-          onClick={likeStoryHandler}
+          onClick={dislikeStoryHandler}
         >
-          <i className="ion-heart"></i> {favoritesCount}
+          Dislike
         </button>
+        {/* ADD condition to discard like/dislike button in profile "my article" tab*/}
+        <>
+          {!favorited && (
+            <button
+              className="btn btn-outline-primary btn-sm pull-xs-right"
+              onClick={likeStoryHandler}
+            >
+              Like
+            </button>
+          )}
+        </>
       </div>
       <Link to={`/article/${props.id}`} className="preview-link">
         <h1>{title}</h1>

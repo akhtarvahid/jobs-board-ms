@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store';
 import ArticlePreview from '../../components/ArticlePreview';
 import { useGetStory } from '../../hooks/useFetchArticles';
-import { fetchAllStory, fetchStoriesFeed } from '../../store/story/storySlice';
+import { handleFetchAllStory, handleFetchStoriesFeed } from '../../store/story/storySlice';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -22,8 +22,8 @@ const Home = () => {
   const { data: newTags, loading: tagsLoading } = useGetStory('/tag');
 
   useEffect(() => {
-    dispatch(fetchStoriesFeed());
-    dispatch(fetchAllStory());
+    dispatch(handleFetchStoriesFeed());
+    dispatch(handleFetchAllStory());
   }, []);
 
   const storiesData =

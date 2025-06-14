@@ -3,10 +3,10 @@ import dateConverter from '../../utils/dateConverter';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  addComment,
-  deleteComment,
-  getComments,
-  updateComment,
+  handleAddComment,
+  handleDeleteComment,
+  handleGetComments,
+  handleUpdateComment,
 } from '../../store/story/storySlice';
 import { RootState, useAppDispatch } from '../../store';
 import { useSelector } from 'react-redux';
@@ -42,7 +42,7 @@ const Comments = ({ slug, isAuth, user }: any) => {
   const comments = [...storyComments];
 
   useEffect(() => {
-    dispatch(getComments({ slug: slug }));
+    dispatch(handleGetComments({ slug: slug }));
   }, [slug]);
 
   const onSubmit: SubmitHandler<Inputs> = async (data: any) => {
@@ -50,10 +50,14 @@ const Comments = ({ slug, isAuth, user }: any) => {
       if (slug) {
         if (editingCommentId) {
           dispatch(
-            updateComment({ slug: slug, id: editingCommentId, comment: data }),
+            handleUpdateComment({
+              slug: slug,
+              id: editingCommentId,
+              comment: data,
+            }),
           );
         } else {
-          dispatch(addComment({ slug: slug, comment: data }));
+          dispatch(handleAddComment({ slug: slug, comment: data }));
         }
         setEditingCommentId(null);
         reset({
@@ -67,10 +71,10 @@ const Comments = ({ slug, isAuth, user }: any) => {
     }
   };
 
-  const handleDeleteComment = async (id: any) => {
+  const deleteCommentHandler = async (id: any) => {
     setDeletingCommentId(id);
     dispatch(
-      deleteComment({
+      handleDeleteComment({
         slug: slug,
         id: id,
       }),
@@ -169,7 +173,7 @@ const Comments = ({ slug, isAuth, user }: any) => {
                         </span>
                         <span
                           className="mod-options"
-                          onClick={() => handleDeleteComment(comment.id)}
+                          onClick={() => deleteCommentHandler(comment.id)}
                         >
                           {deletingCommentId == comment.id
                             ? 'Deleting..'

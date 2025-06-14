@@ -1,14 +1,21 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import api from '../../hooks/api';
+import { Profile } from '../profile/profileSlice';
 
 interface Story {
-  id: any;
-  title: string;
+  id: string;
   slug: string;
+  title: string;
   description: string;
   body: string;
+  createdAt: Date;
+  modifiedAt: Date;
   tagList: string[];
+  favoritesCount: number;
+  owner: Profile;
+  favorited: boolean;
 }
+
 interface Comment {
   id: number;
   body: string;
@@ -32,6 +39,18 @@ interface ApiState {
     stories: Story[];
     storiesCount: number;
   };
+  favoritedData: {
+    stories: Story[];
+    storiesCount: number;
+    isLoading: boolean;
+    error: string | null;
+  };
+  UserData: {
+    stories: Story[];
+    storiesCount: number;
+    isLoading: boolean;
+    error: string | null;
+  };
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
@@ -47,15 +66,27 @@ const initialState: ApiState = {
   allStories: {
     status: 'idle',
     error: null,
-    stories: [story],
+    stories: [story as unknown as Story],
     storiesCount: 0,
     storyComments: [],
   },
   feedStories: {
     status: 'idle',
     error: null,
-    stories: [story],
+    stories: [story as unknown as Story],
     storiesCount: 0,
+  },
+  favoritedData: {
+    stories: [],
+    storiesCount: 0,
+    isLoading: false,
+    error: null,
+  },
+  UserData: {
+    stories: [],
+    storiesCount: 0,
+    isLoading: false,
+    error: null,
   },
   status: 'idle',
   error: null,
@@ -64,14 +95,14 @@ const initialState: ApiState = {
 const API_URL = 'http://localhost:3000/story';
 
 // Async Thunks for CRUD operations
-export const fetchStoriesFeed = createAsyncThunk(
+export const handleFetchStoriesFeed = createAsyncThunk(
   'api/fetchItems/feed',
   async () => {
     const response = await api.get('/story/feed');
     return response.data;
   },
 );
-export const fetchAllStory = createAsyncThunk(
+export const handleFetchAllStory = createAsyncThunk(
   'api/fetchItems/all',
   async () => {
     const response = await api.get('/story/all');
@@ -79,7 +110,7 @@ export const fetchAllStory = createAsyncThunk(
   },
 );
 
-export const addStory = createAsyncThunk(
+export const handleAddStory = createAsyncThunk(
   'story/create',
   async (newStory: any) => {
     const response = await api.post(`/story/create`, newStory);
@@ -88,7 +119,7 @@ export const addStory = createAsyncThunk(
 );
 
 // update story by slug
-export const updateStory = createAsyncThunk(
+export const handleUpdateStory = createAsyncThunk(
   'story/update',
   async (payload: any) => {
     const { slug, story } = payload;
@@ -98,7 +129,7 @@ export const updateStory = createAsyncThunk(
 );
 
 // delete a story by slug
-export const deleteStory = createAsyncThunk(
+export const handleDeleteStory = createAsyncThunk(
   'api/deleteStory',
   async (slug: string) => {
     const response = await api.delete(`${API_URL}/${slug}`);
@@ -108,7 +139,7 @@ export const deleteStory = createAsyncThunk(
 );
 
 // Add comment to story
-export const addComment = createAsyncThunk(
+export const handleAddComment = createAsyncThunk(
   'story/add-comment',
   async (payload: any) => {
     const { slug, comment } = payload;
@@ -118,7 +149,7 @@ export const addComment = createAsyncThunk(
 );
 
 // get all comments of story
-export const getComments = createAsyncThunk(
+export const handleGetComments = createAsyncThunk(
   'story/get-comments',
   async (payload: any) => {
     const { slug } = payload;
@@ -127,7 +158,7 @@ export const getComments = createAsyncThunk(
   },
 );
 
-export const deleteComment = createAsyncThunk(
+export const handleDeleteComment = createAsyncThunk(
   'story/delete-comment',
   async (payload: any) => {
     const { slug, id } = payload;
@@ -136,7 +167,7 @@ export const deleteComment = createAsyncThunk(
     return response.data;
   },
 );
-export const updateComment = createAsyncThunk(
+export const handleUpdateComment = createAsyncThunk(
   'story/update-comment',
   async (payload: any) => {
     const { slug, id, comment } = payload;
@@ -144,6 +175,47 @@ export const updateComment = createAsyncThunk(
     return response.data;
   },
 );
+
+// user favorited stories
+export const userFavoritedStories = createAsyncThunk(
+  'story/favorited',
+  async (payload: any) => {
+    const { username } = payload;
+    const response = await api.get(`story/all?favorited=${username}`);
+    return response.data;
+  },
+);
+
+// current user created stories
+export const userCreatedStories = createAsyncThunk(
+  'story/created',
+  async (payload: any) => {
+    const { username } = payload;
+    const response = await api.get(`story/all?owner=${username}`);
+    return response.data;
+  },
+);
+
+// Like story
+export const handleLikeStory = createAsyncThunk(
+  'story/like-story',
+  async (payload: any) => {
+    const { slug } = payload;
+    const response = await api.post(`/story/${slug}/like`);
+    return response.data;
+  },
+);
+
+// Dislike story
+export const handleDislikeStory = createAsyncThunk(
+  'story/dislike-story',
+  async (payload: any) => {
+    const { slug } = payload;
+    const response = await api.delete(`/story/${slug}/like`);
+    return response.data;
+  },
+);
+
 const storySlice = createSlice({
   name: 'api',
   initialState,
@@ -151,11 +223,11 @@ const storySlice = createSlice({
   extraReducers: (builder) => {
     builder
       // Fetch Items
-      .addCase(fetchStoriesFeed.pending, (state) => {
+      .addCase(handleFetchStoriesFeed.pending, (state) => {
         state.feedStories.status = 'loading';
       })
       .addCase(
-        fetchStoriesFeed.fulfilled,
+        handleFetchStoriesFeed.fulfilled,
         (
           state,
           action: PayloadAction<{ stories: Story[]; storiesCount: number }>,
@@ -165,17 +237,17 @@ const storySlice = createSlice({
           state.feedStories.storiesCount = action.payload.storiesCount;
         },
       )
-      .addCase(fetchStoriesFeed.rejected, (state, action) => {
+      .addCase(handleFetchStoriesFeed.rejected, (state, action) => {
         state.feedStories.status = 'failed';
         state.feedStories.error =
           action.error.message || 'Failed to fetch items';
       })
 
-      .addCase(fetchAllStory.pending, (state) => {
+      .addCase(handleFetchAllStory.pending, (state) => {
         state.status = 'loading';
       })
       .addCase(
-        fetchAllStory.fulfilled,
+        handleFetchAllStory.fulfilled,
         (
           state,
           action: PayloadAction<{ stories: Story[]; storiesCount: number }>,
@@ -185,18 +257,18 @@ const storySlice = createSlice({
           state.allStories.storiesCount = action.payload.storiesCount;
         },
       )
-      .addCase(fetchAllStory.rejected, (state, action) => {
+      .addCase(handleFetchAllStory.rejected, (state, action) => {
         state.allStories.status = 'failed';
         state.allStories.error =
           action.error.message || 'Failed to fetch items';
       })
 
       // Add Item
-      .addCase(addStory.pending, (state) => {
+      .addCase(handleAddStory.pending, (state) => {
         state.allStories.status = 'loading';
       })
       .addCase(
-        addStory.fulfilled,
+        handleAddStory.fulfilled,
         (state, action: PayloadAction<{ type: string; story: Story }>) => {
           state.allStories.status = 'succeeded';
           state.allStories.stories.push(action.payload.story);
@@ -205,36 +277,108 @@ const storySlice = createSlice({
       )
 
       // Update Item
-      .addCase(updateStory.pending, (state) => {
-        state.allStories.status = 'loading';
-      })
-      .addCase(updateStory.fulfilled, (state, action: PayloadAction<any>) => {
-        state.allStories.status = 'succeeded';
-        const index = state.allStories.stories.findIndex(
-          (item) => item.id === action.payload.story.id,
-        );
-        if (index !== -1) {
-          state.allStories.stories[index] = action.payload.story;
-        }
-      })
-
-      // Delete Item
-      .addCase(deleteStory.pending, (state) => {
-        state.allStories.status = 'loading';
-      })
-      .addCase(deleteStory.fulfilled, (state, action: PayloadAction<any>) => {
-        state.allStories.status = 'succeeded';
-        state.allStories.stories = state.allStories.stories.filter(
-          (item) => item.slug !== action.payload.slug,
-        );
-      })
-
-      // Add comment
-      .addCase(addComment.pending, (state) => {
+      .addCase(handleUpdateStory.pending, (state) => {
         state.allStories.status = 'loading';
       })
       .addCase(
-        addComment.fulfilled,
+        handleUpdateStory.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.allStories.status = 'succeeded';
+          const index = state.allStories.stories.findIndex(
+            (item) => item.id === action.payload.story.id,
+          );
+          if (index !== -1) {
+            state.allStories.stories[index] = action.payload.story;
+          }
+        },
+      )
+
+      // Delete Item
+      .addCase(handleDeleteStory.pending, (state) => {
+        state.allStories.status = 'loading';
+      })
+      .addCase(
+        handleDeleteStory.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.allStories.status = 'succeeded';
+          state.allStories.stories = state.allStories.stories.filter(
+            (item) => item.slug !== action.payload.slug,
+          );
+        },
+      )
+
+      // Get favorited stories
+      .addCase(userFavoritedStories.pending, (state) => {
+        state.favoritedData.isLoading = true;
+      })
+      .addCase(
+        userFavoritedStories.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.favoritedData.isLoading = false;
+          state.favoritedData.stories = action.payload.stories;
+          state.favoritedData.storiesCount = action.payload.storiesCount;
+        },
+      )
+
+      // Get all user created stories
+      .addCase(userCreatedStories.pending, (state) => {
+        state.UserData.isLoading = true;
+      })
+      .addCase(
+        userCreatedStories.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.UserData.isLoading = false;
+          state.UserData.stories = action.payload.stories;
+          state.UserData.storiesCount = action.payload.storiesCount;
+        },
+      )
+
+      // Like Story
+      .addCase(handleLikeStory.pending, (state) => {
+        state.feedStories.status = 'loading';
+      })
+      .addCase(
+        handleLikeStory.fulfilled,
+        (state, action: PayloadAction<{ type: string; story: Story }>) => {
+          state.feedStories.status = 'succeeded';
+
+          const index = state.feedStories.stories.findIndex(
+            (item) => item.id === action.payload.story.id,
+          );
+          if (index !== -1) {
+            state.feedStories.stories[index] = action.payload.story;
+          }
+        },
+      )
+
+      // Dislike Story
+      .addCase(handleDislikeStory.pending, (state) => {
+        state.favoritedData.isLoading = true;
+         state.feedStories.status = 'succeeded';
+      })
+      .addCase(
+        handleDislikeStory.fulfilled,
+        (state, action: PayloadAction<{ type: string; story: Story }>) => {
+          state.favoritedData.isLoading = false;
+           state.feedStories.status = 'loading';
+          state.favoritedData.stories = state.favoritedData.stories.filter(
+            (item) => item.id !== action.payload.story.id,
+          );
+          const index = state.feedStories.stories.findIndex(
+            (item) => item.id === action.payload.story.id,
+          );
+          if (index !== -1) {
+            state.feedStories.stories[index] = action.payload.story;
+          }
+        },
+      )
+
+      // Add comment
+      .addCase(handleAddComment.pending, (state) => {
+        state.allStories.status = 'loading';
+      })
+      .addCase(
+        handleAddComment.fulfilled,
         (state, action: PayloadAction<{ type: string; comment: Comment }>) => {
           state.allStories.status = 'succeeded';
           state.allStories.storyComments = [
@@ -244,38 +388,48 @@ const storySlice = createSlice({
         },
       )
       // Get comments
-      .addCase(getComments.pending, (state) => {
+      .addCase(handleGetComments.pending, (state) => {
         state.allStories.status = 'loading';
       })
-      .addCase(getComments.fulfilled, (state, action: PayloadAction<any>) => {
-        state.allStories.status = 'succeeded';
-        state.allStories.storyComments = action.payload.comments;
-      })
+      .addCase(
+        handleGetComments.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.allStories.status = 'succeeded';
+          state.allStories.storyComments = action.payload.comments;
+        },
+      )
 
       // Delete comment
-      .addCase(deleteComment.pending, (state) => {
+      .addCase(handleDeleteComment.pending, (state) => {
         state.allStories.status = 'loading';
       })
-      .addCase(deleteComment.fulfilled, (state, action: PayloadAction<any>) => {
-        state.allStories.status = 'succeeded';
-        state.allStories.storyComments = state.allStories.storyComments.filter(
-          (item) => item.id !== action.payload.id,
-        );
-      })
+      .addCase(
+        handleDeleteComment.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.allStories.status = 'succeeded';
+          state.allStories.storyComments =
+            state.allStories.storyComments.filter(
+              (item) => item.id !== action.payload.id,
+            );
+        },
+      )
 
       // update comment
-      .addCase(updateComment.pending, (state) => {
+      .addCase(handleUpdateComment.pending, (state) => {
         state.allStories.status = 'loading';
       })
-      .addCase(updateComment.fulfilled, (state, action: PayloadAction<any>) => {
-        state.allStories.status = 'succeeded';
-        const index = state.allStories.storyComments.findIndex(
-          (item) => item.id === action.payload.comment.id,
-        );
-        if (index !== -1) {
-          state.allStories.storyComments[index] = action.payload.comment;
-        }
-      });
+      .addCase(
+        handleUpdateComment.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.allStories.status = 'succeeded';
+          const index = state.allStories.storyComments.findIndex(
+            (item) => item.id === action.payload.comment.id,
+          );
+          if (index !== -1) {
+            state.allStories.storyComments[index] = action.payload.comment;
+          }
+        },
+      );
   },
 });
 

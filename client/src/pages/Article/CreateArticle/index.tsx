@@ -3,7 +3,7 @@ import FieldInput from '../../../components/Inputs/FieldInput';
 import { articleObjs } from '../../Authentication/Login/loginData';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { addStory, updateStory } from '../../../store/story/storySlice';
+import { handleAddStory, handleUpdateStory } from '../../../store/story/storySlice';
 import { useAppDispatch } from '../../../store';
 
 type Inputs = {
@@ -45,14 +45,14 @@ const CreateArticle = () => {
     try {
       if (state) {
         dispatch(
-          updateStory({
+          handleUpdateStory({
             slug: state.slug,
             story: data.article,
           }),
         );
       } else {
         dispatch(
-          addStory({
+          handleAddStory({
             story: data.article,
           }),
         );

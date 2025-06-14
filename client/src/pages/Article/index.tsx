@@ -6,7 +6,7 @@ import Comments from '../../components/Comments';
 import ArticleActions from './ArticleActions';
 import { useGetStory } from '../../hooks/useFetchArticles';
 import { useCallback } from 'react';
-import { deleteStory } from '../../store/story/storySlice';
+import { handleDeleteStory } from '../../store/story/storySlice';
 
 const Article = () => {
   const { slug } = useParams();
@@ -24,8 +24,8 @@ const Article = () => {
   const isFavorite = article?.favorited;
   const isSameUser = article?.owner?.username === newUserData?.user?.username;
 
-  const handleDeleteStory = useCallback(async (slug: string) => {
-    dispatch(deleteStory(slug));
+  const deleteStoryHandler = useCallback(async (slug: string) => {
+    dispatch(handleDeleteStory(slug));
   }, []);
 
   return (
@@ -45,7 +45,7 @@ const Article = () => {
             favorite={() => {}}
             navigate={navigate}
             isAuth={isAuth}
-            deleteArticle={handleDeleteStory}
+            deleteArticle={deleteStoryHandler}
             isDeleted={allStories.status === 'loading'}
           />
         </div>
@@ -85,7 +85,7 @@ const Article = () => {
             favorite={() => {}}
             navigate={navigate}
             isAuth={isAuth}
-            deleteArticle={handleDeleteStory}
+            deleteArticle={deleteStoryHandler}
             isDeleted={allStories.status === 'loading'}
           />
         </div>

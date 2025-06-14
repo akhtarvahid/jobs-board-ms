@@ -4,24 +4,26 @@ import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store';
 import ReactPaginate from 'react-paginate';
 import ArticlePreview from '../../components/ArticlePreview';
+import { getProfile } from '../../store/profile/profileSlice';
+import { getUser } from '../../store/user/userAuthSlice';
 import {
-  getProfile,
   userCreatedStories,
   userFavoritedStories,
-} from '../../store/profile/profileSlice';
-import { getUser } from '../../store/user/userAuthSlice';
+} from '../../store/story/storySlice';
 
 const Profile = () => {
   const dispatch = useAppDispatch();
   const {
     profileData: { profile, isLoading: isProfileLoading },
+  } = useSelector((state: RootState) => state.profileState);
+  const {
     favoritedData: {
       stories: favoritedStories,
       isLoading: isFavoritedStoriesLoading,
       storiesCount: favoritedStoriesCount,
     },
     UserData: { stories, isLoading: isUserStoriesLoading, storiesCount },
-  } = useSelector((state: RootState) => state.profileState);
+  } = useSelector((state: RootState) => state.storyState);
   const { username } = useParams();
   const { pathname } = useLocation();
   const tabPath = pathname?.split('/')?.[2];
