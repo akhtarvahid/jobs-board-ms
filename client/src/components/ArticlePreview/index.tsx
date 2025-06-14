@@ -4,20 +4,14 @@ import { useLikeStory } from '../../hooks/useFetchArticles';
 import { avatar } from '../../utils/constant';
 
 const ArticlePreview = (props: any) => {
-  const {
-    owner,
-    modifiedAt,
-    body,
-    favoritesCount,
-    slug,
-    tagList,
-    title,
-  } = props;
+  const { owner, modifiedAt, body, favoritesCount, slug, tagList, title } =
+    props;
 
   const { likeStory } = useLikeStory(`/story/${slug}/like`);
   const likeStoryHandler = () => {
     likeStory();
   };
+
   return (
     <div className="article-preview">
       <div className="article-meta">

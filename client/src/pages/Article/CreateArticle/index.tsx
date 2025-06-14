@@ -21,7 +21,7 @@ const CreateArticle = () => {
 
   const { slug } = useParams();
   const [tags, setTags] = useState([]);
-  const { state } = useLocation();
+  const { state, pathname } = useLocation();
   const {
     register,
     handleSubmit,
@@ -30,10 +30,11 @@ const CreateArticle = () => {
   } = useForm<Inputs>();
 
   useEffect(() => {
-    reset({
-      article: state.article,
-    });
-  }, [state.article]);
+    if (pathname !== '/editor')
+      reset({
+        article: state,
+      });
+  }, [pathname]);
 
   const handleClick = (tag: string) => {
     const updatedTags = tags.filter((t: string) => t !== tag);
@@ -42,10 +43,10 @@ const CreateArticle = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      if (state.article) {
+      if (state) {
         dispatch(
           updateStory({
-            slug: state.article.slug,
+            slug: state.slug,
             story: data.article,
           }),
         );
