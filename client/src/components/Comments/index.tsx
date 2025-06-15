@@ -111,9 +111,7 @@ const Comments = ({ slug, isAuth, user }: any) => {
               <div className="card-footer">
                 <img src={user?.image} className="comment-author-img" />
                 <button className="btn btn-sm btn-primary">
-                  {allStories.status === 'loading'
-                    ? 'Comment adding...'
-                    : 'Post Comment'}
+                  {allStories.status ? 'Comment adding...' : 'Post Comment'}
                 </button>
                 <button
                   className="btn btn-sm btn-danger"

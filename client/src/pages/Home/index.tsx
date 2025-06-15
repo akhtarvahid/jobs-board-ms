@@ -2,7 +2,10 @@ import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store';
 import ArticlePreview from '../../components/ArticlePreview';
 import { useGetStory } from '../../hooks/useFetchArticles';
-import { handleFetchAllStory, handleFetchStoriesFeed } from '../../store/story/storySlice';
+import {
+  handleFetchAllStory,
+  handleFetchStoriesFeed,
+} from '../../store/story/storySlice';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -29,7 +32,7 @@ const Home = () => {
   const storiesData =
     active === 'local' ? feedStories?.stories : allStories?.stories;
 
-  const isLoading = feedStories.status === 'loading';
+  const isLoading = feedStories.status || allStories.status;
 
   const tabClick = (tag: any, tab: any) => {
     setTag(tag);
@@ -60,7 +63,7 @@ const Home = () => {
                     onClick={() => tabClick(undefined, 'global')}
                     to="/"
                   >
-                    Global Feed
+                    Global Feed ({allStories.storiesCount})
                   </Link>
                 </li>
                 {isLoggedIn && (
@@ -72,7 +75,7 @@ const Home = () => {
                       onClick={() => tabClick(undefined, 'local')}
                       to="/"
                     >
-                      Your Feed
+                      Your Feed ({feedStories.storiesCount})
                     </Link>
                   </li>
                 )}
@@ -85,9 +88,6 @@ const Home = () => {
                   </li>
                 )}
               </ul>
-              {isLoading && (
-                <p style={{ marginTop: '2rem' }}>Loading articles...</p>
-              )}
               {storiesData?.length === 0 && !isLoading && (
                 <p style={{ marginTop: '2rem' }}>No articles here... yet.</p>
               )}

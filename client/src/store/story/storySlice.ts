@@ -27,14 +27,14 @@ interface Comment {
 
 interface ApiState {
   allStories: {
-    status: string;
+    status: boolean;
     error: string | null;
     stories: Story[];
     storiesCount: number;
     storyComments: Comment[];
   };
   feedStories: {
-    status: string;
+    status: boolean;
     error: string | null;
     stories: Story[];
     storiesCount: number;
@@ -42,13 +42,13 @@ interface ApiState {
   favoritedData: {
     stories: Story[];
     storiesCount: number;
-    isLoading: boolean;
+    status: boolean;
     error: string | null;
   };
   UserData: {
     stories: Story[];
     storiesCount: number;
-    isLoading: boolean;
+    status: boolean;
     error: string | null;
   };
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -64,14 +64,14 @@ const story = {
 };
 const initialState: ApiState = {
   allStories: {
-    status: 'idle',
+    status: false,
     error: null,
     stories: [story as unknown as Story],
     storiesCount: 0,
     storyComments: [],
   },
   feedStories: {
-    status: 'idle',
+    status: false,
     error: null,
     stories: [story as unknown as Story],
     storiesCount: 0,
@@ -79,13 +79,13 @@ const initialState: ApiState = {
   favoritedData: {
     stories: [],
     storiesCount: 0,
-    isLoading: false,
+    status: false,
     error: null,
   },
   UserData: {
     stories: [],
     storiesCount: 0,
-    isLoading: false,
+    status: false,
     error: null,
   },
   status: 'idle',
@@ -224,7 +224,7 @@ const storySlice = createSlice({
     builder
       // Fetch Items
       .addCase(handleFetchStoriesFeed.pending, (state) => {
-        state.feedStories.status = 'loading';
+        state.feedStories.status = true;
       })
       .addCase(
         handleFetchStoriesFeed.fulfilled,
@@ -232,19 +232,19 @@ const storySlice = createSlice({
           state,
           action: PayloadAction<{ stories: Story[]; storiesCount: number }>,
         ) => {
-          state.feedStories.status = 'succeeded';
+          state.feedStories.status = false;
           state.feedStories.stories = action.payload.stories;
           state.feedStories.storiesCount = action.payload.storiesCount;
         },
       )
       .addCase(handleFetchStoriesFeed.rejected, (state, action) => {
-        state.feedStories.status = 'failed';
+        state.feedStories.status = false;
         state.feedStories.error =
           action.error.message || 'Failed to fetch items';
       })
 
       .addCase(handleFetchAllStory.pending, (state) => {
-        state.status = 'loading';
+        state.allStories.status = true;
       })
       .addCase(
         handleFetchAllStory.fulfilled,
@@ -252,25 +252,25 @@ const storySlice = createSlice({
           state,
           action: PayloadAction<{ stories: Story[]; storiesCount: number }>,
         ) => {
-          state.allStories.status = 'succeeded';
+          state.allStories.status = false;
           state.allStories.stories = action.payload.stories;
           state.allStories.storiesCount = action.payload.storiesCount;
         },
       )
       .addCase(handleFetchAllStory.rejected, (state, action) => {
-        state.allStories.status = 'failed';
+        state.allStories.status = false;
         state.allStories.error =
           action.error.message || 'Failed to fetch items';
       })
 
       // Add Item
       .addCase(handleAddStory.pending, (state) => {
-        state.allStories.status = 'loading';
+        state.allStories.status = true;
       })
       .addCase(
         handleAddStory.fulfilled,
         (state, action: PayloadAction<{ type: string; story: Story }>) => {
-          state.allStories.status = 'succeeded';
+          state.allStories.status = false;
           state.allStories.stories.push(action.payload.story);
           state.allStories.storiesCount += 1;
         },
@@ -278,12 +278,12 @@ const storySlice = createSlice({
 
       // Update Item
       .addCase(handleUpdateStory.pending, (state) => {
-        state.allStories.status = 'loading';
+        state.allStories.status = true;
       })
       .addCase(
         handleUpdateStory.fulfilled,
         (state, action: PayloadAction<any>) => {
-          state.allStories.status = 'succeeded';
+          state.allStories.status = false;
           const index = state.allStories.stories.findIndex(
             (item) => item.id === action.payload.story.id,
           );
@@ -295,12 +295,12 @@ const storySlice = createSlice({
 
       // Delete Item
       .addCase(handleDeleteStory.pending, (state) => {
-        state.allStories.status = 'loading';
+        state.allStories.status = true;
       })
       .addCase(
         handleDeleteStory.fulfilled,
         (state, action: PayloadAction<any>) => {
-          state.allStories.status = 'succeeded';
+          state.allStories.status = false;
           state.allStories.stories = state.allStories.stories.filter(
             (item) => item.slug !== action.payload.slug,
           );
@@ -309,12 +309,12 @@ const storySlice = createSlice({
 
       // Get favorited stories
       .addCase(userFavoritedStories.pending, (state) => {
-        state.favoritedData.isLoading = true;
+        state.favoritedData.status = true;
       })
       .addCase(
         userFavoritedStories.fulfilled,
         (state, action: PayloadAction<any>) => {
-          state.favoritedData.isLoading = false;
+          state.favoritedData.status = false;
           state.favoritedData.stories = action.payload.stories;
           state.favoritedData.storiesCount = action.payload.storiesCount;
         },
@@ -322,12 +322,12 @@ const storySlice = createSlice({
 
       // Get all user created stories
       .addCase(userCreatedStories.pending, (state) => {
-        state.UserData.isLoading = true;
+        state.UserData.status = true;
       })
       .addCase(
         userCreatedStories.fulfilled,
         (state, action: PayloadAction<any>) => {
-          state.UserData.isLoading = false;
+          state.UserData.status = false;
           state.UserData.stories = action.payload.stories;
           state.UserData.storiesCount = action.payload.storiesCount;
         },
@@ -335,32 +335,51 @@ const storySlice = createSlice({
 
       // Like Story
       .addCase(handleLikeStory.pending, (state) => {
-        state.feedStories.status = 'loading';
+        state.feedStories.status = true;
+        state.allStories.status = true;
       })
       .addCase(
         handleLikeStory.fulfilled,
         (state, action: PayloadAction<{ type: string; story: Story }>) => {
-          state.feedStories.status = 'succeeded';
-
-          const index = state.feedStories.stories.findIndex(
+          state.feedStories.status = false;
+          state.allStories.status = false;
+          const fIndex = state.feedStories.stories.findIndex(
             (item) => item.id === action.payload.story.id,
           );
-          if (index !== -1) {
-            state.feedStories.stories[index] = action.payload.story;
+          if (fIndex !== -1) {
+            state.feedStories.stories[fIndex] = action.payload.story;
+          }
+
+          const AIndex = state.allStories.stories.findIndex(
+            (item) => item.id === action.payload.story.id,
+          );
+          if (AIndex !== -1) {
+            state.allStories.stories[AIndex] = action.payload.story;
           }
         },
       )
 
       // Dislike Story
       .addCase(handleDislikeStory.pending, (state) => {
-        state.favoritedData.isLoading = true;
-         state.feedStories.status = 'succeeded';
+        state.favoritedData.status = true;
+        state.feedStories.status = true;
+        state.allStories.status = true;
       })
       .addCase(
         handleDislikeStory.fulfilled,
         (state, action: PayloadAction<{ type: string; story: Story }>) => {
-          state.favoritedData.isLoading = false;
-           state.feedStories.status = 'loading';
+          state.favoritedData.status = false;
+          state.feedStories.status = false;
+
+          state.allStories.status = false;
+
+          const AIndex = state.allStories.stories.findIndex(
+            (item) => item.id === action.payload.story.id,
+          );
+          if (AIndex !== -1) {
+            state.allStories.stories[AIndex] = action.payload.story;
+          }
+
           state.favoritedData.stories = state.favoritedData.stories.filter(
             (item) => item.id !== action.payload.story.id,
           );
@@ -375,12 +394,12 @@ const storySlice = createSlice({
 
       // Add comment
       .addCase(handleAddComment.pending, (state) => {
-        state.allStories.status = 'loading';
+        state.allStories.status = true;
       })
       .addCase(
         handleAddComment.fulfilled,
         (state, action: PayloadAction<{ type: string; comment: Comment }>) => {
-          state.allStories.status = 'succeeded';
+          state.allStories.status = false;
           state.allStories.storyComments = [
             action.payload.comment,
             ...state.allStories.storyComments,
@@ -389,24 +408,24 @@ const storySlice = createSlice({
       )
       // Get comments
       .addCase(handleGetComments.pending, (state) => {
-        state.allStories.status = 'loading';
+        state.allStories.status = true;
       })
       .addCase(
         handleGetComments.fulfilled,
         (state, action: PayloadAction<any>) => {
-          state.allStories.status = 'succeeded';
+          state.allStories.status = false;
           state.allStories.storyComments = action.payload.comments;
         },
       )
 
       // Delete comment
       .addCase(handleDeleteComment.pending, (state) => {
-        state.allStories.status = 'loading';
+        state.allStories.status = true;
       })
       .addCase(
         handleDeleteComment.fulfilled,
         (state, action: PayloadAction<any>) => {
-          state.allStories.status = 'succeeded';
+          state.allStories.status = false;
           state.allStories.storyComments =
             state.allStories.storyComments.filter(
               (item) => item.id !== action.payload.id,
@@ -416,12 +435,12 @@ const storySlice = createSlice({
 
       // update comment
       .addCase(handleUpdateComment.pending, (state) => {
-        state.allStories.status = 'loading';
+        state.allStories.status = true;
       })
       .addCase(
         handleUpdateComment.fulfilled,
         (state, action: PayloadAction<any>) => {
-          state.allStories.status = 'succeeded';
+          state.allStories.status = false;
           const index = state.allStories.storyComments.findIndex(
             (item) => item.id === action.payload.comment.id,
           );

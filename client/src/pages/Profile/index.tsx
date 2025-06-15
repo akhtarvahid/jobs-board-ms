@@ -1,8 +1,7 @@
 import { Link, NavLink, useLocation, useParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store';
-import ReactPaginate from 'react-paginate';
 import ArticlePreview from '../../components/ArticlePreview';
 import { getProfile } from '../../store/profile/profileSlice';
 import { getUser } from '../../store/user/userAuthSlice';
@@ -19,10 +18,10 @@ const Profile = () => {
   const {
     favoritedData: {
       stories: favoritedStories,
-      isLoading: isFavoritedStoriesLoading,
+      status: isFavoritedStoriesLoading,
       storiesCount: favoritedStoriesCount,
     },
-    UserData: { stories, isLoading: isUserStoriesLoading, storiesCount },
+    UserData: { stories, status: isUserStoriesLoading, storiesCount },
   } = useSelector((state: RootState) => state.storyState);
   const { username } = useParams();
   const { pathname } = useLocation();
@@ -32,7 +31,6 @@ const Profile = () => {
     (state: RootState) => state.userAuth,
   );
   const isAuth = !!token;
-  const [currentPage, setCurrentPage] = useState(0);
   useEffect(() => {
     dispatch(getProfile({ username: username }));
     dispatch(getUser());
@@ -53,16 +51,9 @@ const Profile = () => {
 
   const isLoading =
     isUserStoriesLoading || isProfileLoading || isFavoritedStoriesLoading;
-  const count =
-    (tabPath === 'favorites' ? favoritedStoriesCount : storiesCount) || 0;
-  const pageCount = Math.ceil((count || 0) / 10);
   const articlesData = tabPath === 'favorites' ? favoritedStories : stories;
   const isFollowing = profile?.following;
   const isSameUser = currentUser?.user?.username === profile?.username;
-
-  const handlePageClick = (e: any) => {
-    setCurrentPage(e.selected);
-  };
 
   return (
     <div className="profile-page">
@@ -115,20 +106,16 @@ const Profile = () => {
               <ul className="nav nav-pills outline-active">
                 <li className="nav-item">
                   <NavLink className="nav-link" end to={`/${username}`}>
-                    My Articles
+                    My Articles ({storiesCount})
                   </NavLink>
                 </li>
                 <li className="nav-item">
                   <NavLink className="nav-link" to={`/${username}/favorites`}>
-                    Favorited Articles
+                    Favorited Articles ({favoritedStoriesCount})
                   </NavLink>
                 </li>
               </ul>
             </div>
-
-            {isLoading && (
-              <p style={{ marginTop: '2rem' }}>Loading articles...</p>
-            )}
             {articlesData?.length === 0 && !isLoading && (
               <p style={{ marginTop: '2rem' }}>No articles here... yet.</p>
             )}
@@ -142,29 +129,6 @@ const Profile = () => {
                   isAuth={isAuth}
                 />
               ))}
-
-            {!isLoading && (
-              <ReactPaginate
-                breakLabel="..."
-                nextLabel="next >"
-                onPageChange={handlePageClick}
-                pageRangeDisplayed={5}
-                pageCount={pageCount}
-                previousLabel="< previous"
-                renderOnZeroPageCount={null}
-                breakClassName="page-item"
-                breakLinkClassName="page-link"
-                containerClassName="pagination justify-content-center"
-                pageClassName="page-item"
-                pageLinkClassName="page-link"
-                previousClassName="page-item"
-                previousLinkClassName="page-link"
-                nextClassName="page-item"
-                nextLinkClassName="page-link"
-                activeClassName="active"
-                forcePage={currentPage}
-              />
-            )}
           </div>
         </div>
       </div>

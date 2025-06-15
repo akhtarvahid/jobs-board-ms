@@ -46,7 +46,7 @@ const Article = () => {
             navigate={navigate}
             isAuth={isAuth}
             deleteArticle={deleteStoryHandler}
-            isDeleted={allStories.status === 'loading'}
+            isDeleted={allStories.status}
           />
         </div>
       </div>
@@ -86,7 +86,7 @@ const Article = () => {
             navigate={navigate}
             isAuth={isAuth}
             deleteArticle={deleteStoryHandler}
-            isDeleted={allStories.status === 'loading'}
+            isDeleted={allStories.status}
           />
         </div>
 

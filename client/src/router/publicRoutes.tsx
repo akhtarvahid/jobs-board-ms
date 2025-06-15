@@ -1,10 +1,10 @@
-import { Navigate } from 'react-router-dom'
-import Layout from '../Layout'
-import Home from '../pages/Home'
-import Login from '../pages/Authentication/Login'
-import Register from '../pages/Authentication/Register'
-import articleRoutes from './articleRoutes'
-import profileRoutes from './profileRoutes'
+import { Navigate } from 'react-router-dom';
+import Layout from '../Layout';
+import Home from '../pages/Home';
+import Login from '../pages/Authentication/Login';
+import Register from '../pages/Authentication/Register';
+import articleRoutes from './articleRoutes';
+import profileRoutes from './profileRoutes';
 
 const publicRoutes = [
   {
@@ -13,24 +13,24 @@ const publicRoutes = [
     children: [
       {
         path: '/',
-        element: <Home />
+        element: <Home />,
       },
       {
         path: 'login',
-        element: <Login />
+        element: <Login />,
       },
       {
         path: 'register',
-        element: <Register />
+        element: <Register />,
       },
       articleRoutes[1],
-      ...profileRoutes
-    ]
+      ...profileRoutes, // TODO: to remove later
+    ],
   },
   {
     path: '*',
-    element: <Navigate to='/' replace />
-  }
-]
+    element: <Navigate to="/" replace />,
+  },
+];
 
-export default publicRoutes
+export default publicRoutes;
