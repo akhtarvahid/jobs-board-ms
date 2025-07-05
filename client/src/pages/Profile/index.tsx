@@ -3,7 +3,11 @@ import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState, useAppDispatch } from '../../store';
 import ArticlePreview from '../../components/ArticlePreview';
-import { getProfile } from '../../store/profile/profileSlice';
+import {
+  folloProfile,
+  getProfile,
+  unfolloProfile,
+} from '../../store/profile/profileSlice';
 import { getUser } from '../../store/user/userAuthSlice';
 import {
   userCreatedStories,
@@ -52,8 +56,21 @@ const Profile = () => {
   const isLoading =
     isUserStoriesLoading || isProfileLoading || isFavoritedStoriesLoading;
   const articlesData = tabPath === 'favorites' ? favoritedStories : stories;
-  const isFollowing = profile?.following;
   const isSameUser = currentUser?.user?.username === profile?.username;
+
+  const handleFollow = (userame: string | undefined) => {
+    if (userame) {
+      dispatch(
+        !profile?.following
+          ? folloProfile({
+              username: userame,
+            })
+          : unfolloProfile({
+              username: username,
+            }),
+      );
+    }
+  };
 
   return (
     <div className="profile-page">
@@ -78,19 +95,10 @@ const Profile = () => {
               ) : (
                 <button
                   className="btn btn-sm btn-outline-secondary action-btn"
-                  // onClick={() =>
-                  //   handleFollowFunc(
-                  //     profile?.username,
-                  //     isFollowing,
-                  //     unfollow,
-                  //     follow,
-                  //     navigate,
-                  //     isAuth,
-                  //   )
-                  // }
+                  onClick={() => handleFollow(profile?.username)}
                 >
                   <i className="ion-plus-round"></i>
-                  &nbsp; {isFollowing ? 'Unfollow' : 'Follow'}{' '}
+                  &nbsp; {profile?.following ? 'Unfollow' : 'Follow'}{' '}
                   {profile?.username}
                 </button>
               )}

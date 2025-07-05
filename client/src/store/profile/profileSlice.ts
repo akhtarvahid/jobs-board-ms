@@ -21,7 +21,7 @@ const initialState: ApiState = {
     profile: null,
     isLoading: false,
     error: null,
-  }
+  },
 };
 
 // get user profile data
@@ -34,6 +34,25 @@ export const getProfile = createAsyncThunk(
   },
 );
 
+// Follow profile
+export const folloProfile = createAsyncThunk(
+  'profile/follow-profile',
+  async (payload: any) => {
+    const { username } = payload;
+    const response = await api.post(`/profile/${username}/follow`);
+    return response.data;
+  },
+);
+
+// Unfollow profile
+export const unfolloProfile = createAsyncThunk(
+  'profile/unfollow-profile',
+  async (payload: any) => {
+    const { username } = payload;
+    const response = await api.delete(`/profile/${username}/unfollow`);
+    return response.data;
+  },
+);
 const profileSlice = createSlice({
   name: 'api',
   initialState,
@@ -48,6 +67,27 @@ const profileSlice = createSlice({
         state.profileData.isLoading = false;
         state.profileData.profile = action.payload.profile;
       })
+
+      // Follow
+      .addCase(folloProfile.pending, (state) => {
+        state.profileData.isLoading = true;
+      })
+      .addCase(folloProfile.fulfilled, (state, action: PayloadAction<any>) => {
+        state.profileData.isLoading = false;
+        state.profileData.profile = action.payload.profile;
+      })
+
+      // Unfollow
+      .addCase(unfolloProfile.pending, (state) => {
+        state.profileData.isLoading = true;
+      })
+      .addCase(
+        unfolloProfile.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.profileData.isLoading = false;
+          state.profileData.profile = action.payload.profile;
+        },
+      );
   },
 });
 
