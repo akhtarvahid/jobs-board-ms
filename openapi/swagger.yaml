@@ -9,6 +9,15 @@ paths:
           description: ''
       tags:
         - App
+  /tag:
+    get:
+      operationId: TagController_findAllTags
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - Tag
   /user/register:
     post:
       operationId: UserController_createUser
@@ -150,54 +159,6 @@ paths:
         - JWT-auth: []
       summary: Update current user profile
       tags: *ref_0
-  /profile/health:
-    get:
-      operationId: ProfileController_health
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags: &ref_1
-        - Profile
-  /profile/{username}:
-    get:
-      operationId: ProfileController_getProfile
-      parameters:
-        - name: username
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        '200':
-          description: ''
-      tags: *ref_1
-  /profile/{username}/follow:
-    post:
-      operationId: ProfileController_followProfile
-      parameters:
-        - name: username
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        '201':
-          description: ''
-      tags: *ref_1
-  /profile/{username}/unfollow:
-    delete:
-      operationId: ProfileController_unfollowProfile
-      parameters:
-        - name: username
-          required: true
-          in: path
-          schema:
-            type: string
-      responses:
-        '200':
-          description: ''
-      tags: *ref_1
   /story/health:
     get:
       operationId: StoryController_health
@@ -205,7 +166,7 @@ paths:
       responses:
         '200':
           description: ''
-      tags: &ref_2
+      tags: &ref_1
         - Story
   /story/all:
     get:
@@ -224,7 +185,7 @@ paths:
       security:
         - JWT-auth: []
       summary: Get all the story
-      tags: *ref_2
+      tags: *ref_1
   /story/feed:
     get:
       description: Returns logged in user feed story
@@ -242,7 +203,7 @@ paths:
       security:
         - JWT-auth: []
       summary: Get logged in user all the feed story
-      tags: *ref_2
+      tags: *ref_1
   /story/{storyId}:
     get:
       description: Return a story
@@ -267,7 +228,7 @@ paths:
       security:
         - JWT-auth: []
       summary: Get a story
-      tags: *ref_2
+      tags: *ref_1
   /story/create:
     post:
       description: Token is required to create a story
@@ -298,7 +259,7 @@ paths:
       security:
         - JWT-auth: []
       summary: Create a story
-      tags: *ref_2
+      tags: *ref_1
   /story/{slug}:
     put:
       description: Token is required to update a story
@@ -331,7 +292,15 @@ paths:
       security:
         - JWT-auth: []
       summary: Update a story
-      tags: *ref_2
+      tags: *ref_1
+    get:
+      operationId: CommentController_health
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: &ref_3
+        - Comment
     delete:
       operationId: StoryController_deleteAStory
       parameters:
@@ -343,15 +312,7 @@ paths:
       responses:
         '200':
           description: ''
-      tags: *ref_2
-    get:
-      operationId: CommentController_health
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags: &ref_3
-        - Comment
+      tags: *ref_1
   /story/{slug}/like:
     post:
       operationId: StoryController_likeStory
@@ -364,11 +325,59 @@ paths:
       responses:
         '201':
           description: ''
-      tags: *ref_2
+      tags: *ref_1
     delete:
       operationId: StoryController_dislikeStory
       parameters:
         - name: slug
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_1
+  /profile/health:
+    get:
+      operationId: ProfileController_health
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: &ref_2
+        - Profile
+  /profile/{username}:
+    get:
+      operationId: ProfileController_getProfile
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags: *ref_2
+  /profile/{username}/follow:
+    post:
+      operationId: ProfileController_followProfile
+      parameters:
+        - name: username
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '201':
+          description: ''
+      tags: *ref_2
+  /profile/{username}/unfollow:
+    delete:
+      operationId: ProfileController_unfollowProfile
+      parameters:
+        - name: username
           required: true
           in: path
           schema:
@@ -427,15 +436,6 @@ paths:
         '200':
           description: ''
       tags: *ref_3
-  /tag:
-    get:
-      operationId: TagController_findAllTags
-      parameters: []
-      responses:
-        '200':
-          description: ''
-      tags:
-        - Tag
 info:
   title: TIP Medium Service
   description: A Medium Service Provider

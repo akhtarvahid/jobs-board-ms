@@ -188,6 +188,12 @@ export class StoryController {
     return this.storyService.buildStoryResponse(story);
   }
 
+  @Get(':slug')
+  async findAStoryBySlug(@Param('slug') slug: string): Promise<StoryResponse> {
+    const story = await this.storyService.findBySlug(slug);
+    return this.storyService.buildStoryResponse(story);
+  }
+
   @Delete(':slug')
   async deleteAStory(
     @User('id') userId: number,

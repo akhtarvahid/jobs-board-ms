@@ -1,6 +1,11 @@
 import { UserEntity } from '@app/user/user.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { ArrayMinSize, IsNotEmpty, IsOptional, ValidateNested } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsNotEmpty,
+  IsOptional,
+  ValidateNested,
+} from 'class-validator';
 
 export class CreateStory {
   slug: string;

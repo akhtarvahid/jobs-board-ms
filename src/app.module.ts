@@ -20,11 +20,11 @@ import { CommentModule } from './comment/comment.module';
       envFilePath: '.env',
     }),
     TypeOrmModule.forRoot(getTypeOrmConfig),
-    UserModule,
-    ProfileModule,
-    StoryModule,
-    CommentModule,
     TagModule,
+    UserModule,
+    StoryModule,
+    ProfileModule,
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService, JwtService],
@@ -36,9 +36,7 @@ export class AppModule {
       .exclude(
         { path: '/user/login', method: RequestMethod.POST },
         { path: '/user/register', method: RequestMethod.POST },
-         { path: '/tag', method: RequestMethod.ALL },
         // { path: '/story/:slug', method: RequestMethod.GET },
-        { path: '/story/health', method: RequestMethod.GET },
       )
       .forRoutes({
         path: '*',

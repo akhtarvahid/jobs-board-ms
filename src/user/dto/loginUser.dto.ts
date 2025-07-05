@@ -5,7 +5,7 @@ export class LoginUserDto {
   @ApiProperty({
     example: 'john@example.com',
     description: 'Registered email address',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   @IsEmail()
@@ -14,7 +14,7 @@ export class LoginUserDto {
   @ApiProperty({
     example: 'securePassword123!',
     description: 'Account password',
-    required: true
+    required: true,
   })
   @IsNotEmpty()
   readonly password: string;
