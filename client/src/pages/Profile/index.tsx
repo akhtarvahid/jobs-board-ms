@@ -38,20 +38,15 @@ const Profile = () => {
   useEffect(() => {
     dispatch(getProfile({ username: username }));
     dispatch(getUser());
-    if (tabPath === 'favorites') {
-      dispatch(
-        userFavoritedStories({
-          username: username,
-        }),
-      );
-    } else {
-      dispatch(
-        userCreatedStories({
-          username: username,
-        }),
-      );
+
+    if (username) {
+      const requestParam = {
+        username: username,
+      };
+      dispatch(userFavoritedStories(requestParam));
+      dispatch(userCreatedStories(requestParam));
     }
-  }, [username, tabPath]);
+  }, [username, tabPath]); // refetch data on tab change
 
   const isLoading =
     isUserStoriesLoading || isProfileLoading || isFavoritedStoriesLoading;
@@ -60,14 +55,13 @@ const Profile = () => {
 
   const handleFollow = (userame: string | undefined) => {
     if (userame) {
+      const requestParam = {
+        username: username,
+      };
       dispatch(
         !profile?.following
-          ? folloProfile({
-              username: userame,
-            })
-          : unfolloProfile({
-              username: username,
-            }),
+          ? folloProfile(requestParam)
+          : unfolloProfile(requestParam),
       );
     }
   };

@@ -1,12 +1,12 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import './index.css'
-import Router from './router'
-import { Provider } from 'react-redux'
-import { persistor, store } from './store'
-import { QueryClientProvider } from 'react-query'
-import queryClient from './react-query'
-import { PersistGate } from 'redux-persist/integration/react'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import Router from './router';
+import { Provider } from 'react-redux';
+import { persistor, store } from './store';
+import { QueryClientProvider } from 'react-query';
+import queryClient from './react-query';
+import { PersistGate } from 'redux-persist/integration/react';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
@@ -17,5 +17,5 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
         </PersistGate>
       </Provider>
     </QueryClientProvider>
-  </React.StrictMode>
-)
+  </React.StrictMode>,
+);

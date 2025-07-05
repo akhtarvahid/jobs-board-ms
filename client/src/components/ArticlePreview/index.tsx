@@ -6,6 +6,7 @@ import {
   handleDislikeStory,
   handleLikeStory,
 } from '../../store/story/storySlice';
+import { FcLike } from 'react-icons/fc';
 
 const ArticlePreview = (props: any) => {
   const dispatch = useAppDispatch();
@@ -48,13 +49,17 @@ const ArticlePreview = (props: any) => {
         </button>
         {/* ADD condition to discard like/dislike button in profile "my article" tab*/}
         <>
-          {!favorited && (
+          {!favorited ? (
             <button
               className="btn btn-outline-primary btn-sm pull-xs-right"
               onClick={likeStoryHandler}
             >
               Like
             </button>
+          ) : (
+            <span className="btn-outline-primary btn-sm pull-xs-right">
+              <FcLike />
+            </span>
           )}
         </>
       </div>
