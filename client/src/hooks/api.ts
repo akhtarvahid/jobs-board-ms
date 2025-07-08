@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getToken, logout } from '../utils/tokenExpiryCheck';
 
 const api = axios.create({
   baseURL: 'http://localhost:3000', // Replace with your API base URL
@@ -7,10 +8,11 @@ const api = axios.create({
 // Add a request interceptor to include the token in all requests
 api.interceptors.request.use(
   (config) => {
-    const token = JSON.parse(localStorage.getItem('persist:token') ?? '');
-    const parsedToken = JSON.parse(token.token); // Or get token from your preferred storage
-    if (token) {
+    const parsedToken = getToken();
+    if (parsedToken) {
       config.headers.Authorization = `Bearer ${parsedToken.access_token ?? ''}`;
+    } else {
+      logout();
     }
     return config;
   },

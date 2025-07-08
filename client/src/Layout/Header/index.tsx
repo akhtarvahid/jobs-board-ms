@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { RootState } from '../../store';
 import { privateLinks, publicLinks } from './navLinks';
 import { useGetStory } from '../../hooks/useFetchArticles';
+import { getToken } from '../../utils/tokenExpiryCheck';
 
 const Header: React.FC = () => {
+  const navigate = useNavigate();
   const { token } = useSelector((state: RootState) => state.userAuth);
   const { data: newUserData } = useGetStory(`/user/current-user`);
   const userName = newUserData?.user?.username;
@@ -16,6 +18,13 @@ const Header: React.FC = () => {
     });
   }
   const navLinks = token ? privateLinks : publicLinks;
+
+  useEffect(() => {
+    const parsedToken = getToken();
+    if (!parsedToken) {
+      navigate('/');
+    }
+  }, []);
 
   return (
     <nav className="navbar navbar-light">
