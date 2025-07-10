@@ -18,9 +18,12 @@ export const logout = () => {
 
 export const getToken = () => {
   const storageToken = localStorage.getItem('persist:token') || '';
-  const token = JSON.parse(storageToken);
-  const parsedToken = JSON.parse(token?.token); // Or get token from your preferred storage
-  const isExpired = isTokenExpired(parsedToken?.access_token);
+
+  if (!storageToken) return;
+  const { token } = JSON.parse(storageToken);
+
+  const parsedToken = JSON.parse(token);
+  const isExpired = isTokenExpired(parsedToken);
 
   return isExpired ? null : parsedToken;
 };

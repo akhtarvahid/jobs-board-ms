@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getToken, logout } from '../utils/tokenExpiryCheck';
+import { getToken } from '../utils/tokenExpiryCheck';
 
 const api = axios.create({
   baseURL: 'http://localhost:3000', // Replace with your API base URL
@@ -8,11 +8,10 @@ const api = axios.create({
 // Add a request interceptor to include the token in all requests
 api.interceptors.request.use(
   (config) => {
-    const parsedToken = getToken();
+    const storageToken = localStorage.getItem('token') || '';
+    const parsedToken = storageToken || getToken();
     if (parsedToken) {
-      config.headers.Authorization = `Bearer ${parsedToken.access_token ?? ''}`;
-    } else {
-      logout();
+      config.headers.Authorization = `Bearer ${parsedToken ?? ''}`;
     }
     return config;
   },

@@ -1,9 +1,9 @@
-import { Navigate } from 'react-router-dom'
-import Layout from '../Layout'
-import articleRoutes from './articleRoutes'
-import profileRoutes from './profileRoutes'
-import Home from '../pages/Home'
-import Settings from '../pages/Settings'
+import { Navigate } from 'react-router-dom';
+import Layout from '../Layout';
+import articleRoutes from './articleRoutes';
+import profileRoutes from './profileRoutes';
+import Dashboard from '../pages/Dashboard';
+import Settings from '../pages/Settings';
 
 const privateRoutes = [
   {
@@ -11,21 +11,21 @@ const privateRoutes = [
     element: <Layout />,
     children: [
       {
-        path: '/',
-        element: <Home />
+        path: '/dashboard',
+        element: <Dashboard />,
       },
       {
         path: '/settings',
-        element: <Settings />
+        element: <Settings />,
       },
       ...articleRoutes,
-      ...profileRoutes
-    ]
+      ...profileRoutes,
+    ],
   },
   {
     path: '*',
-    element: <Navigate to='/' replace />
-  }
-]
+    element: <Navigate to="/" replace />,
+  },
+];
 
-export default privateRoutes
+export default privateRoutes;

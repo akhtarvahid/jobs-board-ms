@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { RootState } from '../../store';
+import { RootState, useAppDispatch } from '../../store';
 import { privateLinks, publicLinks } from './navLinks';
 import { useGetStory } from '../../hooks/useFetchArticles';
 import { getToken } from '../../utils/tokenExpiryCheck';
+import { logout } from '../../store/user/userAuthSlice';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const { token } = useSelector((state: RootState) => state.userAuth);
   const { data: newUserData } = useGetStory(`/user/current-user`);
   const userName = newUserData?.user?.username;
@@ -26,10 +28,15 @@ const Header: React.FC = () => {
     }
   }, []);
 
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/');
+  };
+
   return (
     <nav className="navbar navbar-light">
       <div className="container">
-        <NavLink className="navbar-brand" to="/">
+        <NavLink className="navbar-brand" to="/dashboard">
           WYS <span style={{ fontSize: '.9rem' }}>write your story</span>
         </NavLink>
         <ul className="nav navbar-nav pull-xs-right">
@@ -57,6 +64,11 @@ const Header: React.FC = () => {
               )}
             </li>
           ))}
+          {token && (
+            <li className="nav-item" onClick={handleLogout}>
+              <a className="nav-link">Logout</a>
+            </li>
+          )}
         </ul>
       </div>
     </nav>

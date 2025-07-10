@@ -2,7 +2,7 @@ const Footer = () => {
   return (
     <footer>
       <div className='container'>
-        <a href='/' className='logo-font'>
+        <a href='/dashboard' className='logo-font'>
           conduit
         </a>
         <span className='attribution'>

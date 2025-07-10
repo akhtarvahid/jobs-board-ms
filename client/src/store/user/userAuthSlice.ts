@@ -7,6 +7,7 @@ export interface UserState {
   image: string;
   bio: string;
   email: string;
+  status: boolean;
 }
 
 interface UserAuthState {
@@ -25,6 +26,7 @@ const initialState: UserAuthState = {
     image: '',
     bio: '',
     email: '',
+    status: false,
   },
   token: null,
   currentUser: {
@@ -38,6 +40,17 @@ export const getUser = createAsyncThunk('user/get-user', async () => {
   const response = await api.get(`user/current-user`);
   return response.data;
 });
+
+// login user
+export const handleLoginUser = createAsyncThunk(
+  'user/login',
+  async (payload: any) => {
+    const { data } = payload;
+    const response = await api.post(`/user/login`, data);
+    return response.data;
+  },
+);
+
 export const userAuthSlice = createSlice({
   name: 'userAuth',
   initialState,
@@ -54,8 +67,10 @@ export const userAuthSlice = createSlice({
         image: '',
         bio: '',
         email: '',
+        status: false,
       };
       state.token = null;
+      localStorage.removeItem('token');
     },
   },
   extraReducers: (builder) => {
@@ -67,7 +82,24 @@ export const userAuthSlice = createSlice({
       .addCase(getUser.fulfilled, (state, action: PayloadAction<any>) => {
         state.currentUser.isLoading = false;
         state.currentUser.user = action.payload.user;
-      });
+      })
+
+      // login user
+      .addCase(handleLoginUser.pending, (state) => {
+        state.user.status = true;
+      })
+      .addCase(
+        handleLoginUser.fulfilled,
+        (state, action: PayloadAction<any>) => {
+          state.user.status = false;
+          state.user = action.payload.user;
+          state.token = action.payload.user?.token?.access_token?.toString();
+          localStorage.setItem(
+            'token',
+            action.payload.user?.token?.access_token,
+          );
+        },
+      );
   },
 });
 

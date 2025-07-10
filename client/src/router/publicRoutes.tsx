@@ -1,10 +1,10 @@
 import { Navigate } from 'react-router-dom';
 import Layout from '../Layout';
-import Home from '../pages/Home';
 import Login from '../pages/Authentication/Login';
 import Register from '../pages/Authentication/Register';
 import articleRoutes from './articleRoutes';
 import profileRoutes from './profileRoutes';
+import Home from '../pages/Home';
 
 const publicRoutes = [
   {

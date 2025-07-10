@@ -16,7 +16,7 @@ export const publicLinks = [
 
 export const privateLinks = [
   {
-    to: '/',
+    to: '/dashboard',
     name: 'Home'
   },
   {

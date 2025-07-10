@@ -22,7 +22,7 @@ const ArticleActions = ({
         // TODO: Delete api call
         deleteArticle(slugData);
         if (!isDeleted) {
-          navigate('/');
+          navigate('/dashboard');
         }
       } catch (error) {
         console.log('Error deleting article:', error);
