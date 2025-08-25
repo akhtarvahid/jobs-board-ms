@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { BuildUserInterface } from './types/buildUserInterface.type';
 import { LoginUserDto } from './dto/loginUser.dto';
-import { UpdateUserDto } from './dto/updateUser.dto';
+import { UpdateUserDto, UpdateUserDtoWrapper } from './dto/updateUser.dto';
 
 @Injectable()
 export class UserService {
@@ -76,7 +76,7 @@ export class UserService {
 
   async updateUser(
     user: UserEntity,
-    updateUserDto: UpdateUserDto,
+    updateUserDto: UpdateUserDtoWrapper,
   ): Promise<UserEntity> {
     const newUser = {
       ...user,

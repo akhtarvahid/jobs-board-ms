@@ -1,0 +1,141 @@
+import { Link, NavLink, useLocation, useParams } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState, useAppDispatch } from '../../store';
+import ArticlePreview from '../../components/ArticlePreview';
+import {
+  folloProfile,
+  getProfile,
+  unfolloProfile,
+} from '../../store/profile/profileSlice';
+import { getUser } from '../../store/user/userAuthSlice';
+import {
+  userCreatedStories,
+  userFavoritedStories,
+} from '../../store/story/storySlice';
+
+const Profile = () => {
+  const dispatch = useAppDispatch();
+  const {
+    profileData: { profile, isLoading: isProfileLoading },
+  } = useSelector((state: RootState) => state.profileState);
+  const {
+    favoritedData: {
+      stories: favoritedStories,
+      status: isFavoritedStoriesLoading,
+      storiesCount: favoritedStoriesCount,
+    },
+    UserData: { stories, status: isUserStoriesLoading, storiesCount },
+  } = useSelector((state: RootState) => state.storyState);
+  const { username } = useParams();
+  const { pathname } = useLocation();
+  const tabPath = pathname?.split('/')?.[2];
+
+  const { token, currentUser } = useSelector(
+    (state: RootState) => state.userAuth,
+  );
+  const isAuth = !!token;
+  useEffect(() => {
+    dispatch(getProfile({ username: username }));
+    dispatch(getUser());
+
+    if (username) {
+      const requestParam = {
+        username: username,
+      };
+      dispatch(userFavoritedStories(requestParam));
+      dispatch(userCreatedStories(requestParam));
+    }
+  }, [username, tabPath]); // refetch data on tab change
+
+  const isLoading =
+    isUserStoriesLoading || isProfileLoading || isFavoritedStoriesLoading;
+  const articlesData = tabPath === 'favorites' ? favoritedStories : stories;
+  const isSameUser = currentUser?.user?.username === profile?.username;
+
+  const handleFollow = (userame: string | undefined) => {
+    if (userame) {
+      const requestParam = {
+        username: username,
+      };
+      dispatch(
+        !profile?.following
+          ? folloProfile(requestParam)
+          : unfolloProfile(requestParam),
+      );
+    }
+  };
+
+  return (
+    <div className="profile-page">
+      <div className="user-info">
+        <div className="container">
+          <div className="row">
+            <div className="col-xs-12 col-md-10 offset-md-1">
+              <img
+                src={profile?.image}
+                className="user-img"
+                style={{ background: '#5CB85C' }}
+              />
+              <h4>{profile?.username}</h4>
+              <p>{profile?.bio}</p>
+              {isSameUser ? (
+                <Link
+                  className="btn btn-sm btn-outline-secondary action-btn"
+                  to="/settings"
+                >
+                  <i className="ion-gear-a"></i> Edit Profile Settings
+                </Link>
+              ) : (
+                <button
+                  className="btn btn-sm btn-outline-secondary action-btn"
+                  onClick={() => handleFollow(profile?.username)}
+                >
+                  <i className="ion-plus-round"></i>
+                  &nbsp; {profile?.following ? 'Unfollow' : 'Follow'}{' '}
+                  {profile?.username}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="container">
+        <div className="row">
+          <div className="col-xs-12 col-md-10 offset-md-1">
+            <div className="articles-toggle">
+              <ul className="nav nav-pills outline-active">
+                <li className="nav-item">
+                  <NavLink className="nav-link" end to={`/${username}`}>
+                    My Articles ({storiesCount})
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to={`/${username}/favorites`}>
+                    Favorited Articles ({favoritedStoriesCount})
+                  </NavLink>
+                </li>
+              </ul>
+            </div>
+            {articlesData?.length === 0 && !isLoading && (
+              <p style={{ marginTop: '2rem' }}>No articles here... yet.</p>
+            )}
+
+            {articlesData &&
+              profile &&
+              articlesData.map((article: any) => (
+                <ArticlePreview
+                  {...article}
+                  key={article?.slug}
+                  isAuth={isAuth}
+                />
+              ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Profile;
